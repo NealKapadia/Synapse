@@ -1,9 +1,133 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SYSTEM_PROMPT } from "@/lib/featherless";
+import { DATA_EXTRACTION_PROMPT, PATIENT_SUMMARY_PROMPT } from "@/lib/featherless";
 
 const FEATHERLESS_API_URL = "https://api.featherless.ai/v1/chat/completions";
 const API_KEY = process.env.FEATHERLESS_API_KEY || "";
 const MODEL = "mistralai/Mistral-Nemo-Instruct-2407"; // 12B parameter Mistral model
+
+function generateFHIRBundle(data: any, text: string) {
+    const patientId = crypto.randomUUID();
+    const encounterId = crypto.randomUUID();
+    const practitionerId = crypto.randomUUID();
+
+    const bundle: any = {
+        resourceType: "Bundle",
+        type: "collection",
+        entry: [
+            {
+                resource: {
+                    resourceType: "Patient",
+                    id: patientId,
+                    active: true,
+                    gender: "unknown"
+                }
+            },
+            {
+                resource: {
+                    resourceType: "Encounter",
+                    id: encounterId,
+                    status: "finished",
+                    class: {
+                        system: "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                        code: "AMB",
+                        display: "ambulatory"
+                    },
+                    subject: {
+                        reference: `Patient/${patientId}`
+                    }
+                }
+            },
+            {
+                resource: {
+                    resourceType: "DocumentReference",
+                    id: crypto.randomUUID(),
+                    status: "current",
+                    type: {
+                        coding: [
+                            {
+                                system: "http://loinc.org",
+                                code: "11488-4",
+                                display: "Consultation note"
+                            }
+                        ]
+                    },
+                    subject: {
+                        reference: `Patient/${patientId}`
+                    },
+                    content: [
+                        {
+                            attachment: {
+                                contentType: "text/plain",
+                                data: Buffer.from(text).toString("base64")
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    };
+
+    if (data.diagnoses && Array.isArray(data.diagnoses)) {
+        data.diagnoses.forEach((diag: any) => {
+            bundle.entry.push({
+                resource: {
+                    resourceType: "Condition",
+                    id: crypto.randomUUID(),
+                    clinicalStatus: {
+                        coding: [
+                            {
+                                system: "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                                code: "active"
+                            }
+                        ]
+                    },
+                    code: {
+                        coding: [
+                            {
+                                system: "http://hl7.org/fhir/sid/icd-10",
+                                code: diag.icd_10_code || "Unknown",
+                                display: diag.condition_name || "Unknown Condition"
+                            }
+                        ],
+                        text: diag.condition_name
+                    },
+                    subject: {
+                        reference: `Patient/${patientId}`
+                    }
+                }
+            });
+        });
+    }
+
+    if (data.treatments && Array.isArray(data.treatments)) {
+        data.treatments.forEach((treatment: string) => {
+            bundle.entry.push({
+                resource: {
+                    resourceType: "MedicationRequest",
+                    id: crypto.randomUUID(),
+                    status: "active",
+                    intent: "order",
+                    medicationCodeableConcept: {
+                        text: treatment
+                    },
+                    subject: {
+                        reference: `Patient/${patientId}`
+                    }
+                }
+            });
+        });
+    }
+
+    return bundle;
+}
+
+function cleanJSON(content: string) {
+    let clean = content.trim();
+    if (clean.startsWith("\`\`\`json")) clean = clean.replace(/^\`\`\`json/, "");
+    if (clean.startsWith("\`\`\`")) clean = clean.replace(/^\`\`\`/, "");
+    if (clean.endsWith("\`\`\`")) clean = clean.replace(/\`\`\`$/, "");
+    return clean.trim();
+}
 
 export async function POST(req: NextRequest) {
     try {
@@ -13,51 +137,62 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Invalid text provided" }, { status: 400 });
         }
 
-        const customizedPrompt = SYSTEM_PROMPT.replace("{{LANGUAGE}}", language);
+        const dataPromptContent = DATA_EXTRACTION_PROMPT;
+        const summaryPromptContent = PATIENT_SUMMARY_PROMPT.replace("{{LANGUAGE}}", language);
 
-        const response = await fetch(FEATHERLESS_API_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${API_KEY}`,
-            },
-            body: JSON.stringify({
-                model: MODEL,
-                messages: [
-                    { role: "system", content: customizedPrompt },
-                    { role: "user", content: `Here is the transcript:\n\n${text}` }
-                ],
-                temperature: 0.1, // Keep it deterministic for JSON output
-            })
-        });
+        const callApi = async (systemContent: string) => {
+            const res = await fetch(FEATHERLESS_API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${API_KEY}`,
+                },
+                body: JSON.stringify({
+                    model: MODEL,
+                    messages: [
+                        { role: "system", content: systemContent },
+                        { role: "user", content: `Here is the transcript:\n\n${text}` }
+                    ],
+                    temperature: 0.1,
+                })
+            });
 
-        if (!response.ok) {
-            console.error("Featherless API Error:", await response.text());
-            return NextResponse.json({ error: "Upstream API error" }, { status: response.status });
-        }
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`Featherless API Error: ${res.status} ${text}`);
+            }
 
-        const data = await response.json();
-        let content = data.choices[0].message.content.trim();
+            const data = await res.json();
+            return data.choices[0].message.content;
+        };
 
-        // Sometimes LLMs still wrap in markdown despite instructions. Clean it up.
-        if (content.startsWith("```json")) {
-            content = content.replace(/^```json/, "");
-        }
-        if (content.startsWith("```")) {
-            content = content.replace(/^```/, "");
-        }
-        if (content.endsWith("```")) {
-            content = content.replace(/```$/, "");
-        }
-        content = content.trim();
+        const [dataResultRaw, summaryResultRaw] = await Promise.all([
+            callApi(dataPromptContent),
+            callApi(summaryPromptContent)
+        ]);
+
+        let dataParsed = {};
+        let summaryParsed = {};
 
         try {
-            const parsed = JSON.parse(content);
-            return NextResponse.json(parsed);
-        } catch (parseError) {
-            console.error("Failed to parse JSON from LLM output:", content);
-            return NextResponse.json({ error: "Failed to parse structured output" }, { status: 500 });
+            dataParsed = JSON.parse(cleanJSON(dataResultRaw));
+        } catch (e) {
+            console.error("Failed to parse data extraction", dataResultRaw);
         }
+
+        try {
+            summaryParsed = JSON.parse(cleanJSON(summaryResultRaw));
+        } catch (e) {
+            console.error("Failed to parse summary", summaryResultRaw);
+        }
+
+        const finalResult = {
+            ...dataParsed,
+            ...summaryParsed,
+            fhirBundle: generateFHIRBundle(dataParsed, text)
+        };
+
+        return NextResponse.json(finalResult);
 
     } catch (error) {
         console.error("API Route Error:", error);
