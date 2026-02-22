@@ -24,11 +24,11 @@ export function StructuredData({ result }: { result: AnalysisResult | null }) {
                         <HeartPulse className="w-4 h-4" /> Vitals
                     </div>
                     <div className="space-y-2 text-sm">
-                        {Object.keys(result.vitals).length > 0 ? (
-                            Object.entries(result.vitals).map(([k, v]) => (
+                        {Object.keys(result.vitals || {}).length > 0 ? (
+                            Object.entries(result.vitals || {}).map(([k, v]) => (
                                 <div key={k} className="flex justify-between border-b border-blue-200/50 dark:border-blue-800/30 pb-1">
                                     <span className="text-neutral-600 dark:text-neutral-400 capitalize">{k}:</span>
-                                    <span className="font-medium text-neutral-900 dark:text-neutral-200">{v}</span>
+                                    <span className="font-medium text-neutral-900 dark:text-neutral-200">{String(v)}</span>
                                 </div>
                             ))
                         ) : <span className="text-neutral-500 italic">None mentioned</span>}
@@ -41,8 +41,8 @@ export function StructuredData({ result }: { result: AnalysisResult | null }) {
                         <AlertCircle className="w-4 h-4" /> Symptoms
                     </div>
                     <ul className="list-disc pl-4 space-y-1 text-sm text-neutral-800 dark:text-neutral-200">
-                        {result.symptoms.length > 0 ? (
-                            result.symptoms.map((s, i) => <li key={i}>{s}</li>)
+                        {(result.symptoms || []).length > 0 ? (
+                            (result.symptoms || []).map((s, i) => <li key={i}>{s}</li>)
                         ) : <span className="text-neutral-500 italic">None listed</span>}
                     </ul>
                 </div>
@@ -54,7 +54,7 @@ export function StructuredData({ result }: { result: AnalysisResult | null }) {
                     <Stethoscope className="w-5 h-5 text-indigo-500" /> Diagnoses & ICD-10
                 </div>
                 <div className="space-y-2">
-                    {result.diagnoses.map((d, i) => (
+                    {(result.diagnoses || []).map((d, i) => (
                         <div key={i} className="flex items-center justify-between bg-white dark:bg-neutral-900 p-3 rounded-lg border border-neutral-200 dark:border-neutral-700">
                             <span className="font-medium">{d.condition}</span>
                             <span className="bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300 text-xs px-2.5 py-1 rounded-md font-mono border border-indigo-200 dark:border-indigo-800">
@@ -62,7 +62,7 @@ export function StructuredData({ result }: { result: AnalysisResult | null }) {
                             </span>
                         </div>
                     ))}
-                    {result.diagnoses.length === 0 && <p className="text-sm text-neutral-500 italic">No specific diagnoses identified.</p>}
+                    {(result.diagnoses || []).length === 0 && <p className="text-sm text-neutral-500 italic">No specific diagnoses identified.</p>}
                 </div>
             </div>
 
@@ -72,12 +72,12 @@ export function StructuredData({ result }: { result: AnalysisResult | null }) {
                     <Pill className="w-5 h-5 text-emerald-500" /> Recommended Treatments
                 </div>
                 <div className="flex flex-wrap gap-2">
-                    {result.treatments.map((t, i) => (
+                    {(result.treatments || []).map((t, i) => (
                         <span key={i} className="bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-sm px-3 py-1.5 rounded-full">
                             {t}
                         </span>
                     ))}
-                    {result.treatments.length === 0 && <p className="text-sm text-neutral-500 italic">No treatments mentioned.</p>}
+                    {(result.treatments || []).length === 0 && <p className="text-sm text-neutral-500 italic">No treatments mentioned.</p>}
                 </div>
             </div>
 
