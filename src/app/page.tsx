@@ -57,7 +57,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-[1600px] mx-auto w-full">
+      <main className="flex-1 p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
         {/* Left Column: Input Methods */}
         <section className="col-span-1 lg:col-span-3 space-y-6">
           <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700">
@@ -80,7 +80,7 @@ export default function Home() {
         </section>
 
         {/* Middle Column: Raw Transcript & Analysis */}
-        <section className="col-span-1 lg:col-span-4 space-y-6 flex flex-col">
+        <section className="col-span-1 lg:col-span-3 space-y-6 flex flex-col">
           <TranscriptPanel
             transcript={transcript}
             onChange={setTranscript}
@@ -89,15 +89,23 @@ export default function Home() {
           />
         </section>
 
-        {/* Right Column: Extracted Data & FHIR */}
-        <section className="col-span-1 lg:col-span-5 flex flex-col gap-6">
-          <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 flex flex-col">
+        {/* Third Column: Extracted Data */}
+        <section className="col-span-1 lg:col-span-3 flex flex-col gap-6">
+          <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 flex flex-col h-full flex-1">
             <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4 border-b border-neutral-200 dark:border-neutral-700 pb-2">Structured Medical Data</h2>
-            <StructuredData result={analysisResult} onLanguageChange={handleAnalyze} isAnalyzing={isAnalyzing} />
+            <div className="overflow-y-auto pr-2">
+              <StructuredData result={analysisResult} onLanguageChange={handleAnalyze} isAnalyzing={isAnalyzing} />
+            </div>
           </div>
-          <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 flex flex-col">
+        </section>
+
+        {/* Fourth Column: FHIR */}
+        <section className="col-span-1 lg:col-span-3 flex flex-col gap-6">
+          <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 flex flex-col h-full flex-1">
             <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4 border-b border-neutral-200 dark:border-neutral-700 pb-2">FHIR JSON Export Preview</h2>
-            <FHIRExport result={analysisResult} />
+            <div className="overflow-y-auto pr-2">
+              <FHIRExport result={analysisResult} />
+            </div>
           </div>
         </section>
       </main>
