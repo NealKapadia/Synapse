@@ -153,11 +153,13 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
                             Object.entries(result.vitals || {}).map(([k, v]) => {
                                 const isAbnormal = v.is_abnormal;
                                 return (
-                                    <div key={k} className="flex flex-col xl:flex-row xl:items-center justify-between border-b border-blue-200/50 dark:border-blue-800/30 pb-1 gap-0.5 xl:gap-2">
-                                        <span className="text-neutral-600 dark:text-neutral-400 capitalize break-words">{k}:</span>
-                                        <span className={`font-medium flex items-start xl:items-center gap-1.5 break-words ${isAbnormal ? 'text-red-600 dark:text-red-400' : 'text-neutral-900 dark:text-neutral-200'}`}>
-                                            {isAbnormal && <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 xl:mt-0" />}
-                                            <span className="break-words">{v.measurement}</span>
+                                    <div key={k} className="flex flex-col items-center justify-center border-b border-blue-200/50 dark:border-blue-800/30 pb-2 pt-1 px-1 w-full overflow-hidden text-center">
+                                        <span className="text-neutral-500 dark:text-neutral-400 capitalize text-xs mb-0.5 break-words max-w-full">
+                                            {k.replace(/([A-Z])/g, ' $1').trim()}
+                                        </span>
+                                        <span className={`font-semibold flex items-center justify-center gap-1 text-sm break-words max-w-full ${isAbnormal ? 'text-red-600 dark:text-red-400' : 'text-neutral-900 dark:text-neutral-200'}`}>
+                                            {isAbnormal && <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />}
+                                            {v.measurement}
                                         </span>
                                     </div>
                                 );
@@ -294,14 +296,14 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
                 <p className="text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm whitespace-pre-wrap mb-4">
                     {result.patientSummary}
                 </p>
-                <div className="flex flex-wrap items-center justify-end gap-2 border-t border-violet-200/50 dark:border-violet-800/30 pt-3 mt-4">
+                <div className="flex justify-end gap-3 border-t border-violet-200/50 dark:border-violet-800/30 pt-3">
                     <input
                         type="tel"
                         placeholder="+1 (555) 000-0000"
                         value={phoneNumber}
                         onChange={handlePhoneChange}
                         disabled={isAnalyzing || isSmsSending}
-                        className="bg-white dark:bg-neutral-800 border border-violet-200 dark:border-violet-800 rounded-md text-sm px-3 py-1.5 text-neutral-800 dark:text-neutral-200 disabled:opacity-50 outline-none focus:ring-2 focus:ring-violet-500 w-36 sm:w-40 shadow-sm"
+                        className="bg-white dark:bg-neutral-800 border border-violet-200 dark:border-violet-800 rounded-md text-sm px-3 py-1.5 text-neutral-800 dark:text-neutral-200 disabled:opacity-50 outline-none focus:ring-2 focus:ring-violet-500 w-48 shadow-sm"
                     />
                     <button
                         onClick={handleSms}
