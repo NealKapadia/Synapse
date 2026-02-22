@@ -1,5 +1,5 @@
 export interface AnalysisResult {
-    vitals: Record<string, string>;
+    vitals: Record<string, { measurement: string; is_abnormal: boolean }>;
     symptoms: string[];
     diagnoses: {
         condition_name: string;

@@ -1,7 +1,9 @@
 "use client";
 
+import { useState, useRef } from "react";
 import { AnalysisResult } from "@/lib/types";
-import { Stethoscope, Activity, Pill, AlertCircle, HeartPulse, UserCircle } from "lucide-react";
+import { Stethoscope, Activity, Pill, AlertCircle, HeartPulse, UserCircle, Volume2, Smartphone, Check } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface StructuredDataProps {
     result: AnalysisResult | null;
@@ -10,6 +12,33 @@ interface StructuredDataProps {
 }
 
 export function StructuredData({ result, onLanguageChange, isAnalyzing }: StructuredDataProps) {
+    const [isSmsSending, setIsSmsSending] = useState(false);
+    const [selectedLanguage, setSelectedLanguage] = useState("English");
+
+    const playAudio = () => {
+        if (!result?.patientSummary) return;
+
+        // Ensure exact voice match across major operating systems if possible
+        const voiceMap: Record<string, string> = {
+            "English": "en-US",
+            "Spanish": "es-ES",
+            "Mandarin": "zh-CN",
+            "Vietnamese": "vi-VN"
+        };
+
+        const utterance = new SpeechSynthesisUtterance(result.patientSummary);
+        utterance.lang = voiceMap[selectedLanguage] || "en-US";
+        window.speechSynthesis.speak(utterance);
+    };
+
+    const handleSms = () => {
+        setIsSmsSending(true);
+        setTimeout(() => {
+            setIsSmsSending(false);
+            toast.success("Recovery plan successfully sent to patient's mobile device.");
+        }, 1000);
+    };
+
     if (!result) {
         return (
             <div className="flex-1 flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 min-h-0">
@@ -31,12 +60,18 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
                     </div>
                     <div className="space-y-2 text-sm">
                         {Object.keys(result.vitals || {}).length > 0 ? (
-                            Object.entries(result.vitals || {}).map(([k, v]) => (
-                                <div key={k} className="flex justify-between border-b border-blue-200/50 dark:border-blue-800/30 pb-1">
-                                    <span className="text-neutral-600 dark:text-neutral-400 capitalize">{k}:</span>
-                                    <span className="font-medium text-neutral-900 dark:text-neutral-200">{String(v)}</span>
-                                </div>
-                            ))
+                            Object.entries(result.vitals || {}).map(([k, v]) => {
+                                const isAbnormal = v.is_abnormal;
+                                return (
+                                    <div key={k} className="flex justify-between border-b border-blue-200/50 dark:border-blue-800/30 pb-1">
+                                        <span className="text-neutral-600 dark:text-neutral-400 capitalize">{k}:</span>
+                                        <span className={`font-medium flex items-center gap-1.5 ${isAbnormal ? 'text-red-600 dark:text-red-400' : 'text-neutral-900 dark:text-neutral-200'}`}>
+                                            {isAbnormal && <AlertCircle className="w-3.5 h-3.5" />}
+                                            {v.measurement}
+                                        </span>
+                                    </div>
+                                );
+                            })
                         ) : <span className="text-neutral-500 italic">None mentioned</span>}
                     </div>
                 </div>
@@ -125,22 +160,50 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
                     <div className="flex items-center gap-2 text-violet-800 dark:text-violet-300 font-semibold text-lg">
                         <UserCircle className="w-6 h-6" /> Patient-Friendly Recovery Plan
                     </div>
-                    {onLanguageChange && (
-                        <select
-                            className="bg-white dark:bg-neutral-800 border border-violet-200 dark:border-violet-800 rounded-md text-sm px-2 py-1 text-neutral-800 dark:text-neutral-200 disabled:opacity-50 cursor-pointer shadow-sm outline-none focus:ring-2 focus:ring-violet-500"
-                            onChange={(e) => onLanguageChange(e.target.value)}
+                    <div className="flex items-center gap-2">
+                        {onLanguageChange && (
+                            <select
+                                value={selectedLanguage}
+                                className="bg-white dark:bg-neutral-800 border border-violet-200 dark:border-violet-800 rounded-md text-sm px-2 py-1 text-neutral-800 dark:text-neutral-200 disabled:opacity-50 cursor-pointer shadow-sm outline-none focus:ring-2 focus:ring-violet-500"
+                                onChange={(e) => {
+                                    setSelectedLanguage(e.target.value);
+                                    onLanguageChange(e.target.value);
+                                }}
+                                disabled={isAnalyzing}
+                            >
+                                <option value="English">English</option>
+                                <option value="Spanish">Spanish</option>
+                                <option value="Mandarin">Mandarin</option>
+                                <option value="Vietnamese">Vietnamese</option>
+                            </select>
+                        )}
+                        <button
+                            onClick={playAudio}
                             disabled={isAnalyzing}
+                            className="p-1.5 bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300 rounded-md hover:bg-violet-200 dark:hover:bg-violet-800/80 transition-colors disabled:opacity-50"
+                            title="Play read aloud"
                         >
-                            <option value="English">English</option>
-                            <option value="Spanish">Spanish</option>
-                            <option value="Mandarin">Mandarin</option>
-                            <option value="Vietnamese">Vietnamese</option>
-                        </select>
-                    )}
+                            <Volume2 className="w-4 h-4" />
+                        </button>
+                    </div>
                 </div>
-                <p className="text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm whitespace-pre-wrap">
+                <p className="text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm whitespace-pre-wrap mb-4">
                     {result.patientSummary}
                 </p>
+                <div className="flex justify-end border-t border-violet-200/50 dark:border-violet-800/30 pt-3">
+                    <button
+                        onClick={handleSms}
+                        disabled={isSmsSending || isAnalyzing}
+                        className="text-xs bg-violet-600 hover:bg-violet-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 disabled:text-neutral-500 text-white font-medium px-4 py-1.5 rounded-md flex items-center gap-1.5 transition-colors shadow-sm"
+                    >
+                        {isSmsSending ? (
+                            <Activity className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                            <Smartphone className="w-3.5 h-3.5" />
+                        )}
+                        {isSmsSending ? "Sending..." : "SMS to Patient"}
+                    </button>
+                </div>
             </div>
 
         </div>

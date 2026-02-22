@@ -9,10 +9,9 @@ You MUST return your response as a single, valid JSON object with EXACTLY the fo
 
 {
   "vitals": {
-    "bloodPressure": "string or null",
-      "heartRate": "string or null",
-        "oxygenSaturation": "string or null",
-          "...any other vitals mentioned": "string or null"
+    "bloodPressure": { "measurement": "string", "is_abnormal": false },
+    "heartRate": { "measurement": "string", "is_abnormal": true },
+    "...any other vitals mentioned": { "measurement": "string", "is_abnormal": false }
   },
   "symptoms": ["string", "string"],
     "diagnoses": [
