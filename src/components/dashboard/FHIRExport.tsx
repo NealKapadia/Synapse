@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AnalysisResult } from "@/lib/types";
 import { DownloadCloud, Check, FileJson } from "lucide-react";
+import toast from "react-hot-toast";
 
 export function FHIRExport({ result }: { result: AnalysisResult | null }) {
     const [copied, setCopied] = useState(false);
@@ -35,6 +36,7 @@ export function FHIRExport({ result }: { result: AnalysisResult | null }) {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        toast.success("Successfully synced to Axxess EMR.");
     };
 
     return (
@@ -69,7 +71,7 @@ export function FHIRExport({ result }: { result: AnalysisResult | null }) {
                         className="text-xs w-full justify-center bg-indigo-600 hover:bg-indigo-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 disabled:text-neutral-500 disabled:cursor-not-allowed text-white font-medium px-4 py-2 rounded-md flex items-center gap-1.5 transition-all shadow-sm"
                     >
                         <DownloadCloud className="w-3.5 h-3.5" />
-                        Export to Epic EMR
+                        Sync to Axxess EMR
                     </button>
                 </div>
             </div>

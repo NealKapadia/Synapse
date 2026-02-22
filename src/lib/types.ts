@@ -33,9 +33,9 @@ export const SCENARIOS: Scenario[] = [
         mockTranscript: "Patient is here for a 3-month follow-up of type 2 diabetes. Blood sugars have been running in the 130s to 150s fasting. He has been taking Metformin 1000mg twice daily and reports no side effects. Weight is stable at 195 lbs. Blood pressure today is 125/80. He denies any neuropathy or vision changes."
     },
     {
-        id: 'faster-doc',
-        name: 'Faster Documentation',
-        description: 'Quick outpatient clinic visit for a rash.',
-        mockTranscript: "Patient comes in complaining of an itchy, red rash on the right forearm that started 2 days ago after hiking. It is raised and blistering. It looks like typical contact dermatitis, likely poison ivy. We will start on topical hydrocortisone and over the counter diphenhydramine as needed."
+        id: 'home-health',
+        name: 'Home Health Assessment',
+        description: 'Routine home care visit for a post-operative elderly patient.',
+        mockTranscript: "Patient is a 78-year-old female seen at home for a routine post-operative check following a right hip replacement two weeks ago. Incision site is clean, dry, and intact with no signs of infection. Patient reports pain is well-controlled at a 3 out of 10 using Tylenol. Vitals: BP 130/80, HR 82, SpO2 97% on room air. She is ambulating well with her walker. Will continue current home physical therapy plan."
     }
 ];

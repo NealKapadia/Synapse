@@ -9,9 +9,9 @@ You MUST return your response as a single, valid JSON object with EXACTLY the fo
 
 {
   "vitals": {
-    "bloodPressure": { "measurement": "string", "is_abnormal": false },
-    "heartRate": { "measurement": "string", "is_abnormal": true },
-    "...any other vitals mentioned": { "measurement": "string", "is_abnormal": false }
+    "bloodPressure": { "measurement": "string", "is_abnormal": "boolean (true if clinically abnormal)" },
+    "heartRate": { "measurement": "string", "is_abnormal": "boolean (true if clinically abnormal)" },
+    "...any other vitals mentioned": { "measurement": "string", "is_abnormal": "boolean (true if clinically abnormal)" }
   },
   "symptoms": ["string", "string"],
     "diagnoses": [
@@ -34,6 +34,7 @@ You MUST return your response as a single, valid JSON object with EXACTLY the fo
 }
 
 Important Rules:
-- If a value is not mentioned in the transcript, omit it from the array or set the object key to null(for vitals).
+- If a value is not mentioned in the transcript, omit it from the array or set the object key to null (for vitals).
+- When determining "is_abnormal" for vitals, use standard clinical bounds (e.g., HR > 100 or < 60 is abnormal, BP > 120/80 is abnormal, SpO2 < 95 is abnormal).
 - The FHIR bundle must be structurally valid R4 JSON.Generate mock UUIDs for resource IDs and references.
 - DO NOT INCLUDE ANY OUTSIDE TEXT, ONLY RETURN VALID JSON.`;
