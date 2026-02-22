@@ -41,10 +41,10 @@ export function TranscriptPanel({ transcript, onChange, onAnalyze, isAnalyzing }
                         onClick={onAnalyze}
                         disabled={!transcript.trim() || isAnalyzing}
                         className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold shadow-lg transition-all ${!transcript.trim()
-                                ? "bg-neutral-200 text-neutral-400 cursor-not-allowed dark:bg-neutral-700 dark:text-neutral-500"
-                                : isAnalyzing
-                                    ? "bg-blue-400 text-white cursor-wait"
-                                    : "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-xl hover:-translate-y-0.5"
+                            ? "bg-neutral-200 text-neutral-400 cursor-not-allowed dark:bg-neutral-700 dark:text-neutral-500"
+                            : isAnalyzing
+                                ? "bg-blue-400 text-white cursor-wait"
+                                : "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-xl hover:-translate-y-0.5"
                             }`}
                     >
                         {isAnalyzing ? (
@@ -52,7 +52,7 @@ export function TranscriptPanel({ transcript, onChange, onAnalyze, isAnalyzing }
                         ) : (
                             <Play className="w-5 h-5 fill-current" />
                         )}
-                        {isAnalyzing ? "Analyzing with Llama-3..." : "Extract Insights"}
+                        {isAnalyzing ? "Analyzing with featherless.ai..." : "Extract Insights"}
                     </button>
                 </div>
             </div>

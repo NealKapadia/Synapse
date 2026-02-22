@@ -71,12 +71,12 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
 
         utterance.onstart = () => setIsPlaying(true);
         utterance.onend = () => setIsPlaying(false);
-        utterance.onerror = (e) => {
-            console.error("TTS Error:", e);
-            setIsPlaying(false);
-            if (e.error !== "interrupted" && e.error !== "canceled") {
+        utterance.onerror = (e: any) => {
+            if (e?.error !== "interrupted" && e?.error !== "canceled") {
+                console.error("TTS Error:", e);
                 toast.error("Audio playback failed.");
             }
+            setIsPlaying(false);
         };
 
         window.speechSynthesis.speak(utterance);

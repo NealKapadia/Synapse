@@ -3,7 +3,7 @@ import { SYSTEM_PROMPT } from "@/lib/featherless";
 
 const FEATHERLESS_API_URL = "https://api.featherless.ai/v1/chat/completions";
 const API_KEY = process.env.FEATHERLESS_API_KEY || "";
-const MODEL = "deepseek-ai/DeepSeek-V3-0324"; // Or meta-llama/Llama-3.3-70B-Instruct
+const MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct"; // Lighter and faster model
 
 export async function POST(req: NextRequest) {
     try {
