@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { AnalysisResult } from "@/lib/types";
-import { Stethoscope, Activity, Pill, AlertCircle, HeartPulse, UserCircle, Volume2, Smartphone, Check } from "lucide-react";
+import { Stethoscope, Activity, Pill, AlertCircle, HeartPulse, UserCircle, Volume2, VolumeX, Smartphone, Check } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface StructuredDataProps {
@@ -14,11 +14,43 @@ interface StructuredDataProps {
 export function StructuredData({ result, onLanguageChange, isAnalyzing }: StructuredDataProps) {
     const [isSmsSending, setIsSmsSending] = useState(false);
     const [selectedLanguage, setSelectedLanguage] = useState("English");
+    const [isPlaying, setIsPlaying] = useState(false);
+
+    useEffect(() => {
+        // Pre-load voices for some browsers
+        const loadVoices = () => {
+            window.speechSynthesis.getVoices();
+        };
+        loadVoices();
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        return () => {
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+        };
+    }, []);
 
     const playAudio = () => {
+        if (!window.speechSynthesis) {
+            toast.error("Text-to-speech is not supported in this browser.");
+            return;
+        }
+
+        // Toggle playback: if currently playing, cancel it
+        if (isPlaying) {
+            window.speechSynthesis.cancel();
+            setIsPlaying(false);
+            return;
+        }
+
         if (!result?.patientSummary) return;
 
-        // Ensure exact voice match across major operating systems if possible
+        // Ensure clean state
+        window.speechSynthesis.cancel();
+
         const voiceMap: Record<string, string> = {
             "English": "en-US",
             "Spanish": "es-ES",
@@ -26,8 +58,27 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
             "Vietnamese": "vi-VN"
         };
 
+        const targetLang = voiceMap[selectedLanguage] || "en-US";
         const utterance = new SpeechSynthesisUtterance(result.patientSummary);
-        utterance.lang = voiceMap[selectedLanguage] || "en-US";
+        utterance.lang = targetLang;
+
+        // Attempt to find a specific voice to improve reliability
+        const voices = window.speechSynthesis.getVoices();
+        const voice = voices.find(v => v.lang.startsWith(targetLang) || v.lang.startsWith(targetLang.split('-')[0]));
+        if (voice) {
+            utterance.voice = voice;
+        }
+
+        utterance.onstart = () => setIsPlaying(true);
+        utterance.onend = () => setIsPlaying(false);
+        utterance.onerror = (e) => {
+            console.error("TTS Error:", e);
+            setIsPlaying(false);
+            if (e.error !== "interrupted" && e.error !== "canceled") {
+                toast.error("Audio playback failed.");
+            }
+        };
+
         window.speechSynthesis.speak(utterance);
     };
 
@@ -181,9 +232,9 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
                             onClick={playAudio}
                             disabled={isAnalyzing}
                             className="p-1.5 bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300 rounded-md hover:bg-violet-200 dark:hover:bg-violet-800/80 transition-colors disabled:opacity-50"
-                            title="Play read aloud"
+                            title={isPlaying ? "Stop audio" : "Play read aloud"}
                         >
-                            <Volume2 className="w-4 h-4" />
+                            {isPlaying ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                         </button>
                     </div>
                 </div>
