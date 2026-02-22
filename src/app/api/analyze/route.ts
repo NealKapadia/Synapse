@@ -7,11 +7,13 @@ const MODEL = "deepseek-ai/DeepSeek-V3-0324"; // Or meta-llama/Llama-3.3-70B-Ins
 
 export async function POST(req: NextRequest) {
     try {
-        const { text } = await req.json();
+        const { text, language = "English" } = await req.json();
 
         if (!text || typeof text !== "string") {
             return NextResponse.json({ error: "Invalid text provided" }, { status: 400 });
         }
+
+        const customizedPrompt = SYSTEM_PROMPT.replace("{{LANGUAGE}}", language);
 
         const response = await fetch(FEATHERLESS_API_URL, {
             method: "POST",
@@ -22,7 +24,7 @@ export async function POST(req: NextRequest) {
             body: JSON.stringify({
                 model: MODEL,
                 messages: [
-                    { role: "system", content: SYSTEM_PROMPT },
+                    { role: "system", content: customizedPrompt },
                     { role: "user", content: `Here is the transcript:\n\n${text}` }
                 ],
                 temperature: 0.1, // Keep it deterministic for JSON output

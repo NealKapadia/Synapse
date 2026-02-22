@@ -1,7 +1,12 @@
 export interface AnalysisResult {
     vitals: Record<string, string>;
     symptoms: string[];
-    diagnoses: { condition: string; icd10: string }[];
+    diagnoses: {
+        condition_name: string;
+        icd_10_code: string;
+        confidence_score: number;
+        differential_diagnoses: string[];
+    }[];
     treatments: string[];
     patientSummary: string;
     fhirBundle?: any;
@@ -19,7 +24,7 @@ export const SCENARIOS: Scenario[] = [
         id: 'er-triage',
         name: 'Emergency Room Triage',
         description: 'Patient presents with severe chest pain and shortness of breath.',
-        mockTranscript: "Patient is a 55-year-old male presenting with severe, crushing chest pain radiating to the left arm that started 30 minutes ago. He reports shortness of breath and diaphoresis. Vitals show BP 160/95, HR 110, SpO2 94% on room air. He has a history of hypertension but no known coronary artery disease."
+        mockTranscript: "Unit 4 to receiving, we are en route with a 55-year-old male, GCS 15, complaining of crushing substernal chest pain radiating to the left shoulder. Onset 30 minutes ago PTA. Patient is diaphoretic and tachypneic. Vitals: BP 160/95, heart rate 110 regular, respiratory rate 22, SpO2 94% on room air. We administered 324mg aspirin PO and assisted with one of the patient's own nitro tabs sublingually 5 minutes ago with no relief. No known history of CAD, but has a history of hypertension. ETA 5 minutes."
     },
     {
         id: 'telehealth',

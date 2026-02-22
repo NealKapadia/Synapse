@@ -20,7 +20,7 @@ export default function Home() {
     setTranscript(text);
   };
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = async (language: string = "English") => {
     if (!transcript.trim()) return;
     setIsAnalyzing(true);
 
@@ -28,7 +28,7 @@ export default function Home() {
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: transcript })
+        body: JSON.stringify({ text: transcript, language })
       });
 
       if (!response.ok) {
@@ -84,7 +84,7 @@ export default function Home() {
           <TranscriptPanel
             transcript={transcript}
             onChange={setTranscript}
-            onAnalyze={handleAnalyze}
+            onAnalyze={() => handleAnalyze("English")}
             isAnalyzing={isAnalyzing}
           />
         </section>
@@ -93,7 +93,7 @@ export default function Home() {
         <section className="col-span-1 lg:col-span-5 flex flex-col gap-6">
           <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 flex flex-col">
             <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4 border-b border-neutral-200 dark:border-neutral-700 pb-2">Structured Medical Data</h2>
-            <StructuredData result={analysisResult} />
+            <StructuredData result={analysisResult} onLanguageChange={handleAnalyze} isAnalyzing={isAnalyzing} />
           </div>
           <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 flex flex-col">
             <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4 border-b border-neutral-200 dark:border-neutral-700 pb-2">FHIR JSON Export Preview</h2>
