@@ -13,6 +13,7 @@ interface StructuredDataProps {
 
 export function StructuredData({ result, onLanguageChange, isAnalyzing }: StructuredDataProps) {
     const [isSmsSending, setIsSmsSending] = useState(false);
+    const [phoneNumber, setPhoneNumber] = useState("");
     const [selectedLanguage, setSelectedLanguage] = useState("English");
     const [isPlaying, setIsPlaying] = useState(false);
 
@@ -82,12 +83,36 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
         window.speechSynthesis.speak(utterance);
     };
 
-    const handleSms = () => {
+    const handleSms = async () => {
+        if (!phoneNumber) {
+            toast.error("Please enter a valid phone number.");
+            return;
+        }
+
         setIsSmsSending(true);
-        setTimeout(() => {
-            setIsSmsSending(false);
+        try {
+            const response = await fetch("/api/sms", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    phoneNumber,
+                    messageBody: result?.patientSummary
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Failed to send SMS");
+            }
+
             toast.success("Recovery plan successfully sent to patient's mobile device.");
-        }, 1000);
+            setPhoneNumber(""); // clear input after success
+        } catch (error: any) {
+            console.error("SMS Error:", error);
+            toast.error(error.message || "Failed to send SMS.");
+        } finally {
+            setIsSmsSending(false);
+        }
     };
 
     if (!result) {
@@ -255,10 +280,18 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
                 <p className="text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm whitespace-pre-wrap mb-4">
                     {result.patientSummary}
                 </p>
-                <div className="flex justify-end border-t border-violet-200/50 dark:border-violet-800/30 pt-3">
+                <div className="flex justify-end gap-3 border-t border-violet-200/50 dark:border-violet-800/30 pt-3">
+                    <input
+                        type="tel"
+                        placeholder="+1 (555) 000-0000"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        disabled={isAnalyzing || isSmsSending}
+                        className="bg-white dark:bg-neutral-800 border border-violet-200 dark:border-violet-800 rounded-md text-sm px-3 py-1.5 text-neutral-800 dark:text-neutral-200 disabled:opacity-50 outline-none focus:ring-2 focus:ring-violet-500 w-48 shadow-sm"
+                    />
                     <button
                         onClick={handleSms}
-                        disabled={isSmsSending || isAnalyzing}
+                        disabled={isSmsSending || isAnalyzing || !phoneNumber.trim()}
                         className="text-xs bg-violet-600 hover:bg-violet-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 disabled:text-neutral-500 text-white font-medium px-4 py-1.5 rounded-md flex items-center gap-1.5 transition-colors shadow-sm"
                     >
                         {isSmsSending ? (
@@ -266,7 +299,7 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
                         ) : (
                             <Smartphone className="w-3.5 h-3.5" />
                         )}
-                        {isSmsSending ? "Sending..." : "SMS to Patient"}
+                        {isSmsSending ? "Sending..." : "SMS Plan to Patient"}
                     </button>
                 </div>
             </div>
