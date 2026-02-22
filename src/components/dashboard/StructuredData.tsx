@@ -296,27 +296,27 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
                 <p className="text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm whitespace-pre-wrap mb-4">
                     {result.patientSummary}
                 </p>
-                <div className="flex justify-end gap-3 border-t border-violet-200/50 dark:border-violet-800/30 pt-3">
-                    <input
-                        type="tel"
-                        placeholder="+1 (555) 000-0000"
-                        value={phoneNumber}
-                        onChange={handlePhoneChange}
-                        disabled={isAnalyzing || isSmsSending}
-                        className="bg-white dark:bg-neutral-800 border border-violet-200 dark:border-violet-800 rounded-md text-sm px-3 py-1.5 text-neutral-800 dark:text-neutral-200 disabled:opacity-50 outline-none focus:ring-2 focus:ring-violet-500 w-48 shadow-sm"
-                    />
+                <div className="flex flex-col items-end gap-2 border-t border-violet-200/50 dark:border-violet-800/30 pt-3">
                     <button
                         onClick={handleSms}
                         disabled={isSmsSending || isAnalyzing || !phoneNumber.trim()}
-                        className="text-xs bg-violet-600 hover:bg-violet-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 disabled:text-neutral-500 text-white font-medium px-4 py-1.5 rounded-md flex items-center gap-1.5 transition-colors shadow-sm"
+                        className="text-xs bg-violet-600 hover:bg-violet-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 disabled:text-neutral-500 text-white font-medium px-4 py-1.5 rounded-md flex items-center justify-center gap-1.5 transition-colors shadow-sm w-40"
                     >
                         {isSmsSending ? (
                             <Activity className="w-3.5 h-3.5 animate-spin" />
                         ) : (
                             <Smartphone className="w-3.5 h-3.5" />
                         )}
-                        {isSmsSending ? "Sending..." : "SMS Plan to Patient"}
+                        {isSmsSending ? "Sending..." : "SMS Plan"}
                     </button>
+                    <input
+                        type="tel"
+                        placeholder="+1 (555) 000-0000"
+                        value={phoneNumber}
+                        onChange={handlePhoneChange}
+                        disabled={isAnalyzing || isSmsSending}
+                        className="bg-white dark:bg-neutral-800 border border-violet-200 dark:border-violet-800 rounded-md text-xs px-2 py-1.5 text-neutral-800 dark:text-neutral-200 disabled:opacity-50 outline-none focus:ring-2 focus:ring-violet-500 w-40 shadow-sm text-center placeholder:text-neutral-400"
+                    />
                 </div>
             </div>
 
