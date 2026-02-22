@@ -7,8 +7,8 @@ import { Scenarios } from "@/components/dashboard/Scenarios";
 import { TranscriptPanel } from "@/components/dashboard/TranscriptPanel";
 import { StructuredData } from "@/components/dashboard/StructuredData";
 import { FHIRExport } from "@/components/dashboard/FHIRExport";
+import { AppLogo } from "@/components/dashboard/AppLogo";
 import { AnalysisResult } from "@/lib/types";
-import { Activity } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function Home() {
@@ -49,11 +49,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 flex flex-col font-sans">
       <header className="bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 p-4 sticky top-0 z-10 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-2">
-          <div className="bg-blue-600 p-2 rounded-lg">
-            <Activity className="w-5 h-5 text-white" />
-          </div>
-          <h1 className="text-xl font-bold tracking-tight">Aegis Diagnostic Assistant</h1>
+        <div className="flex items-center gap-4">
+          <AppLogo />
+          <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-cyan-500 dark:from-blue-400 dark:to-cyan-300">Axxess Aegis Diagnostic Assistant</h1>
         </div>
       </header>
 
