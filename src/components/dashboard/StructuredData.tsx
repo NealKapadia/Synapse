@@ -83,9 +83,23 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
         window.speechSynthesis.speak(utterance);
     };
 
+    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const cleaned = e.target.value.replace(/\D/g, '').substring(0, 10);
+        let formatted = cleaned;
+        if (cleaned.length > 6) {
+            formatted = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
+        } else if (cleaned.length > 3) {
+            formatted = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}`;
+        } else if (cleaned.length > 0) {
+            formatted = `(${cleaned}`;
+        }
+        setPhoneNumber(formatted);
+    };
+
     const handleSms = async () => {
-        if (!phoneNumber) {
-            toast.error("Please enter a valid phone number.");
+        const cleanedNumber = phoneNumber.replace(/\D/g, '');
+        if (cleanedNumber.length !== 10) {
+            toast.error("Please enter a valid 10-digit phone number.");
             return;
         }
 
@@ -95,7 +109,7 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    phoneNumber,
+                    phoneNumber: `+1${cleanedNumber}`,
                     messageBody: result?.patientSummary
                 })
             });
@@ -285,7 +299,7 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
                         type="tel"
                         placeholder="+1 (555) 000-0000"
                         value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        onChange={handlePhoneChange}
                         disabled={isAnalyzing || isSmsSending}
                         className="bg-white dark:bg-neutral-800 border border-violet-200 dark:border-violet-800 rounded-md text-sm px-3 py-1.5 text-neutral-800 dark:text-neutral-200 disabled:opacity-50 outline-none focus:ring-2 focus:ring-violet-500 w-48 shadow-sm"
                     />
