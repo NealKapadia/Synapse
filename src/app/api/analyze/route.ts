@@ -3,7 +3,7 @@ import { SYSTEM_PROMPT } from "@/lib/featherless";
 
 const FEATHERLESS_API_URL = "https://api.featherless.ai/v1/chat/completions";
 const API_KEY = process.env.FEATHERLESS_API_KEY || "";
-const MODEL = "Qwen/Qwen2.5-72B-Instruct"; // Ungated, highly capable, and empathetic model
+const MODEL = "Qwen/Qwen2.5-14B-Instruct"; // Lightweight, fast Qwen model
 
 export async function POST(req: NextRequest) {
     try {
