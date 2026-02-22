@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { AnalysisResult } from "@/lib/types";
-import { Stethoscope, Activity, Pill, AlertCircle, HeartPulse, UserCircle, Volume2, VolumeX, Smartphone, Check } from "lucide-react";
+import { Stethoscope, Activity, Pill, AlertCircle, HeartPulse, UserCircle, Volume2, VolumeX, Smartphone, Check, Bot } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface StructuredDataProps {
@@ -200,6 +200,20 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
                     {(result.treatments || []).length === 0 && <p className="text-sm text-neutral-500 italic">No treatments mentioned.</p>}
                 </div>
             </div>
+
+            {/* Agentic Insights */}
+            {result.agentic_follow_ups && result.agentic_follow_ups.length > 0 && (
+                <div className="bg-fuchsia-50 dark:bg-fuchsia-900/10 rounded-xl p-5 border border-fuchsia-200 dark:border-fuchsia-800 shadow-sm relative overflow-hidden mt-4">
+                    <div className="flex items-center gap-2 mb-3 text-fuchsia-800 dark:text-fuchsia-300 font-semibold text-lg border-b border-fuchsia-200/50 dark:border-fuchsia-800/30 pb-3">
+                        <Bot className="w-6 h-6" /> Agentic Insights: Recommended Follow-ups
+                    </div>
+                    <ul className="list-disc pl-5 space-y-2 text-sm text-fuchsia-900 dark:text-fuchsia-100/90 leading-relaxed">
+                        {result.agentic_follow_ups.map((q, idx) => (
+                            <li key={idx} className="font-medium">{q}</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
 
             <div className="bg-violet-50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-900/30 rounded-xl p-5 mt-4 relative">
                 {isAnalyzing && (

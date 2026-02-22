@@ -8,6 +8,7 @@ export interface AnalysisResult {
         differential_diagnoses: string[];
     }[];
     treatments: string[];
+    agentic_follow_ups?: string[];
     patientSummary: string;
     fhirBundle?: any;
 }
