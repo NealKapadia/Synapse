@@ -22,10 +22,10 @@ export interface Scenario {
 
 export const SCENARIOS: Scenario[] = [
     {
-        id: 'er-triage',
-        name: 'Emergency Room Triage',
-        description: 'Patient presents with severe chest pain and shortness of breath.',
-        mockTranscript: "Unit 4 to receiving, we are en route with a 55-year-old male, GCS 15, complaining of crushing substernal chest pain radiating to the left shoulder. Onset 30 minutes ago PTA. Patient is diaphoretic and tachypneic. Vitals: BP 160/95, heart rate 110 regular, respiratory rate 22, SpO2 94% on room air. We administered 324mg aspirin PO and assisted with one of the patient's own nitro tabs sublingually 5 minutes ago with no relief. No known history of CAD, but has a history of hypertension. ETA 5 minutes."
+        id: 'home-health-admission',
+        name: 'Home Health Admission',
+        description: 'Initial intake assessment for a patient recently discharged for COPD exacerbation.',
+        mockTranscript: "Patient is an 82-year-old male seen today for initial home health admission following a 4-day hospital stay for a COPD exacerbation. He reports feeling 'tired' but breathing is much better than last week. Vitals: BP 142/88, HR 88 regular, RR 18, and SpO2 93% on 2L nasal cannula. Lungs have mild scattered wheezes. He is taking his Prednisone taper and using Albuterol nebulizer every 6 hours as needed. He denies any new chest pain or lower extremity edema. Plan is to set up a nursing aide twice a week to assist with bathing due to generalized weakness, and will refer to respiratory therapy."
     },
     {
         id: 'telehealth',

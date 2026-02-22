@@ -3,7 +3,7 @@ import { DATA_EXTRACTION_PROMPT, PATIENT_SUMMARY_PROMPT } from "@/lib/featherles
 
 const FEATHERLESS_API_URL = "https://api.featherless.ai/v1/chat/completions";
 const API_KEY = process.env.FEATHERLESS_API_KEY || "";
-const MODEL = "Qwen/Qwen2.5-14B-Instruct"; // 14B parameter Qwen model
+const MODEL = "mistralai/Mistral-Nemo-Instruct-2407"; // 12B parameter Mistral model
 
 function generateFHIRBundle(data: any, text: string) {
     const patientId = crypto.randomUUID();
