@@ -55,10 +55,10 @@ export function FHIRExport({ result }: { result: AnalysisResult | null }) {
                     </span>
                 </label>
 
-                <div className="flex items-center justify-end gap-2 shrink-0">
+                <div className="flex flex-col gap-2 shrink-0 w-full md:w-auto">
                     <button
                         onClick={handleCopy}
-                        className="text-xs bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 font-medium px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors"
+                        className="text-xs w-full justify-center bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 font-medium px-4 py-2 rounded-md flex items-center gap-1.5 transition-colors"
                     >
                         {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <FileJson className="w-3.5 h-3.5" />}
                         {copied ? "Copied!" : "Copy JSON"}
@@ -66,7 +66,7 @@ export function FHIRExport({ result }: { result: AnalysisResult | null }) {
                     <button
                         onClick={handleDownload}
                         disabled={!isVerified}
-                        className="text-xs bg-indigo-600 hover:bg-indigo-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 disabled:text-neutral-500 disabled:cursor-not-allowed text-white font-medium px-4 py-1.5 rounded-md flex items-center gap-1.5 transition-all shadow-sm"
+                        className="text-xs w-full justify-center bg-indigo-600 hover:bg-indigo-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 disabled:text-neutral-500 disabled:cursor-not-allowed text-white font-medium px-4 py-2 rounded-md flex items-center gap-1.5 transition-all shadow-sm"
                     >
                         <DownloadCloud className="w-3.5 h-3.5" />
                         Export to Epic EMR

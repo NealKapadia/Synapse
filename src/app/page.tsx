@@ -91,9 +91,9 @@ export default function Home() {
 
         {/* Third Column: Extracted Data */}
         <section className="col-span-1 lg:col-span-3 flex flex-col gap-6">
-          <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 flex flex-col h-full flex-1">
+          <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 flex flex-col h-fit">
             <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4 border-b border-neutral-200 dark:border-neutral-700 pb-2">Structured Medical Data</h2>
-            <div className="overflow-y-auto pr-2">
+            <div className="pr-2">
               <StructuredData result={analysisResult} onLanguageChange={handleAnalyze} isAnalyzing={isAnalyzing} />
             </div>
           </div>
