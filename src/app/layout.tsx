@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Aegis Diagnostic Assistant",
-  description: "AI-powered clinical transcription and diagnostic extraction",
+  title: "Synapse: The AI Second Responder",
+  description: "AI-powered clinical transcription and prehospital PCR extraction",
 };
 
 export default function RootLayout({

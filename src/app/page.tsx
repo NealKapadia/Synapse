@@ -6,7 +6,7 @@ import { LiveMic } from "@/components/audio/LiveMic";
 import { Scenarios } from "@/components/dashboard/Scenarios";
 import { TranscriptPanel } from "@/components/dashboard/TranscriptPanel";
 import { StructuredData } from "@/components/dashboard/StructuredData";
-import { FHIRExport } from "@/components/dashboard/FHIRExport";
+import { PCRExport } from "@/components/dashboard/PCRExport";
 import { AppLogo } from "@/components/dashboard/AppLogo";
 import { AnalysisResult } from "@/lib/types";
 import toast from "react-hot-toast";
@@ -51,7 +51,7 @@ export default function Home() {
       <header className="bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 p-4 sticky top-0 z-10 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-4">
           <AppLogo />
-          <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-cyan-500 dark:from-blue-400 dark:to-cyan-300">Axxess Aegis Diagnostic Assistant</h1>
+          <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-cyan-500 dark:from-blue-400 dark:to-cyan-300">Synapse: The AI Second Responder</h1>
         </div>
       </header>
 
@@ -92,17 +92,17 @@ export default function Home() {
           <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 flex flex-col h-fit">
             <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4 border-b border-neutral-200 dark:border-neutral-700 pb-2">Structured Medical Data</h2>
             <div className="pr-2">
-              <StructuredData result={analysisResult} onLanguageChange={handleAnalyze} isAnalyzing={isAnalyzing} />
+              <StructuredData result={analysisResult} isAnalyzing={isAnalyzing} />
             </div>
           </div>
         </section>
 
-        {/* Fourth Column: FHIR */}
+        {/* Fourth Column: PCR */}
         <section className="col-span-1 lg:col-span-3 flex flex-col gap-6">
           <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 flex flex-col h-full flex-1">
-            <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4 border-b border-neutral-200 dark:border-neutral-700 pb-2">FHIR JSON Export Preview</h2>
+            <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4 border-b border-neutral-200 dark:border-neutral-700 pb-2">Patient Care Report (PCR) Export</h2>
             <div className="overflow-y-auto pr-2">
-              <FHIRExport result={analysisResult} />
+              <PCRExport result={analysisResult} />
             </div>
           </div>
         </section>

@@ -1,144 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
-import { DATA_EXTRACTION_PROMPT, PATIENT_SUMMARY_PROMPT } from "@/lib/featherless";
+import { DATA_EXTRACTION_PROMPT, PCR_GENERATION_PROMPT } from "@/lib/featherless";
 
 const FEATHERLESS_API_URL = "https://api.featherless.ai/v1/chat/completions";
 const API_KEY = process.env.FEATHERLESS_API_KEY || "";
-const MODEL = "Qwen/Qwen2.5-14B-Instruct"; // 14B parameter Qwen model
-
-function generateFHIRBundle(data: any, text: string) {
-    const patientId = crypto.randomUUID();
-    const encounterId = crypto.randomUUID();
-    const practitionerId = crypto.randomUUID();
-
-    const bundle: any = {
-        resourceType: "Bundle",
-        type: "collection",
-        entry: [
-            {
-                resource: {
-                    resourceType: "Patient",
-                    id: patientId,
-                    active: true,
-                    gender: "unknown"
-                }
-            },
-            {
-                resource: {
-                    resourceType: "Encounter",
-                    id: encounterId,
-                    status: "finished",
-                    class: {
-                        system: "http://terminology.hl7.org/CodeSystem/v3-ActCode",
-                        code: "AMB",
-                        display: "ambulatory"
-                    },
-                    subject: {
-                        reference: `Patient/${patientId}`
-                    }
-                }
-            },
-            {
-                resource: {
-                    resourceType: "DocumentReference",
-                    id: crypto.randomUUID(),
-                    status: "current",
-                    type: {
-                        coding: [
-                            {
-                                system: "http://loinc.org",
-                                code: "11488-4",
-                                display: "Consultation note"
-                            }
-                        ]
-                    },
-                    subject: {
-                        reference: `Patient/${patientId}`
-                    },
-                    content: [
-                        {
-                            attachment: {
-                                contentType: "text/plain",
-                                data: Buffer.from(text).toString("base64")
-                            }
-                        }
-                    ]
-                }
-            }
-        ]
-    };
-
-    if (data.diagnoses && Array.isArray(data.diagnoses)) {
-        data.diagnoses.forEach((diag: any) => {
-            bundle.entry.push({
-                resource: {
-                    resourceType: "Condition",
-                    id: crypto.randomUUID(),
-                    clinicalStatus: {
-                        coding: [
-                            {
-                                system: "http://terminology.hl7.org/CodeSystem/condition-clinical",
-                                code: "active"
-                            }
-                        ]
-                    },
-                    code: {
-                        coding: [
-                            {
-                                system: "http://hl7.org/fhir/sid/icd-10",
-                                code: diag.icd_10_code || "Unknown",
-                                display: diag.condition_name || "Unknown Condition"
-                            }
-                        ],
-                        text: diag.condition_name
-                    },
-                    subject: {
-                        reference: `Patient/${patientId}`
-                    }
-                }
-            });
-        });
-    }
-
-    if (data.treatments && Array.isArray(data.treatments)) {
-        data.treatments.forEach((treatment: string) => {
-            bundle.entry.push({
-                resource: {
-                    resourceType: "MedicationRequest",
-                    id: crypto.randomUUID(),
-                    status: "active",
-                    intent: "order",
-                    medicationCodeableConcept: {
-                        text: treatment
-                    },
-                    subject: {
-                        reference: `Patient/${patientId}`
-                    }
-                }
-            });
-        });
-    }
-
-    return bundle;
-}
+const MODEL = "mistralai/Mistral-Nemo-Instruct-2407"; // 12B parameter Mistral model
 
 function cleanJSON(content: string) {
     let clean = content.trim();
-    if (clean.startsWith("\`\`\`json")) clean = clean.replace(/^\`\`\`json/, "");
-    if (clean.startsWith("\`\`\`")) clean = clean.replace(/^\`\`\`/, "");
-    if (clean.endsWith("\`\`\`")) clean = clean.replace(/\`\`\`$/, "");
+    if (clean.startsWith("```json")) clean = clean.replace(/^```json/, "");
+    if (clean.startsWith("```")) clean = clean.replace(/^```/, "");
+    if (clean.endsWith("```")) clean = clean.replace(/```$/, "");
     return clean.trim();
 }
 
 export async function POST(req: NextRequest) {
     try {
-        const { text, language = "English" } = await req.json();
+        const { text } = await req.json();
 
         if (!text || typeof text !== "string") {
             return NextResponse.json({ error: "Invalid text provided" }, { status: 400 });
         }
 
         const dataPromptContent = DATA_EXTRACTION_PROMPT;
-        const summaryPromptContent = PATIENT_SUMMARY_PROMPT.replace("{{LANGUAGE}}", language);
+        const pcrPromptContent = PCR_GENERATION_PROMPT;
 
         const callApi = async (systemContent: string) => {
             const res = await fetch(FEATHERLESS_API_URL, {
@@ -159,20 +43,20 @@ export async function POST(req: NextRequest) {
 
             if (!res.ok) {
                 const text = await res.text();
-                throw new Error(`Featherless API Error: ${res.status} ${text}`);
+                throw new Error(`API Error: ${res.status} ${text}`);
             }
 
             const data = await res.json();
             return data.choices[0].message.content;
         };
 
-        const [dataResultRaw, summaryResultRaw] = await Promise.all([
+        const [dataResultRaw, pcrResultRaw] = await Promise.all([
             callApi(dataPromptContent),
-            callApi(summaryPromptContent)
+            callApi(pcrPromptContent)
         ]);
 
         let dataParsed = {};
-        let summaryParsed = {};
+        let pcrParsed = {};
 
         try {
             dataParsed = JSON.parse(cleanJSON(dataResultRaw));
@@ -181,15 +65,14 @@ export async function POST(req: NextRequest) {
         }
 
         try {
-            summaryParsed = JSON.parse(cleanJSON(summaryResultRaw));
+            pcrParsed = JSON.parse(cleanJSON(pcrResultRaw));
         } catch (e) {
-            console.error("Failed to parse summary", summaryResultRaw);
+            console.error("Failed to parse PCR", pcrResultRaw);
         }
 
         const finalResult = {
             ...dataParsed,
-            ...summaryParsed,
-            fhirBundle: generateFHIRBundle(dataParsed, text)
+            ...pcrParsed
         };
 
         return NextResponse.json(finalResult);

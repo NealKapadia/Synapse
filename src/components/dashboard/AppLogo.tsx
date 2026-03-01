@@ -9,8 +9,8 @@ export function AppLogo() {
             {/* Image Container */}
             <div className="relative bg-white dark:bg-neutral-900 ring-1 ring-neutral-200 dark:ring-neutral-800 p-1.5 rounded-lg flex items-center justify-center overflow-hidden">
                 <Image
-                    src="/axxess-aegis.png"
-                    alt="Axxess Aegis Logo"
+                    src="/Synapse.png"
+                    alt="Synapse Logo"
                     width={28}
                     height={28}
                     className="object-contain"

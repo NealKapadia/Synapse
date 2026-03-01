@@ -52,7 +52,7 @@ export function TranscriptPanel({ transcript, onChange, onAnalyze, isAnalyzing }
                         ) : (
                             <Play className="w-5 h-5 fill-current" />
                         )}
-                        {isAnalyzing ? "Analyzing with featherless.ai..." : "Extract Insights"}
+                        {isAnalyzing ? "Analyzing..." : "Extract Insights"}
                     </button>
                 </div>
             </div>

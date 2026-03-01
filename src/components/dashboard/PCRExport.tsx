@@ -2,41 +2,41 @@
 
 import { useState } from "react";
 import { AnalysisResult } from "@/lib/types";
-import { DownloadCloud, Check, FileJson } from "lucide-react";
+import { DownloadCloud, Check, FileText } from "lucide-react";
 import toast from "react-hot-toast";
 
-export function FHIRExport({ result }: { result: AnalysisResult | null }) {
+export function PCRExport({ result }: { result: AnalysisResult | null }) {
     const [copied, setCopied] = useState(false);
     const [isVerified, setIsVerified] = useState(false);
 
-    if (!result || !result.fhirBundle) {
+    if (!result || !result.patientCareReport) {
         return (
             <div className="flex-1 flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 min-h-0">
-                <FileJson className="w-12 h-12 mb-3 opacity-20" />
-                <p className="text-sm">FHIR Bundle will appear here.</p>
+                <FileText className="w-12 h-12 mb-3 opacity-20" />
+                <p className="text-sm">Patient Care Report (PCR) will appear here.</p>
             </div>
         );
     }
 
-    const jsonString = JSON.stringify(result.fhirBundle, null, 2);
+    const reportText = result.patientCareReport;
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(jsonString);
+        navigator.clipboard.writeText(reportText);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
 
     const handleDownload = () => {
-        const blob = new Blob([jsonString], { type: "application/json" });
+        const blob = new Blob([reportText], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `fhir-encounter-${new Date().toISOString().slice(0, 10)}.json`;
+        a.download = `pcr-export-${new Date().toISOString().slice(0, 10)}.txt`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        toast.success("Successfully synced to Axxess EMR.");
+        toast.success("Successfully exported PCR.");
     };
 
     return (
@@ -53,7 +53,7 @@ export function FHIRExport({ result }: { result: AnalysisResult | null }) {
                         <Check className="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" strokeWidth={3} />
                     </div>
                     <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 group-hover:text-black dark:group-hover:text-white transition-colors select-none">
-                        I, the attending clinician, have reviewed this AI-generated transcript and verify its clinical accuracy.
+                        I, the attending first responder, have reviewed this AI-generated PCR narrative and verify its clinical accuracy in accordance with HIPAA standards.
                     </span>
                 </label>
 
@@ -62,8 +62,8 @@ export function FHIRExport({ result }: { result: AnalysisResult | null }) {
                         onClick={handleCopy}
                         className="text-xs w-full justify-center bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 font-medium px-4 py-2 rounded-md flex items-center gap-1.5 transition-colors"
                     >
-                        {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <FileJson className="w-3.5 h-3.5" />}
-                        {copied ? "Copied!" : "Copy JSON"}
+                        {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <FileText className="w-3.5 h-3.5" />}
+                        {copied ? "Copied!" : "Copy PCR"}
                     </button>
                     <button
                         onClick={handleDownload}
@@ -71,20 +71,20 @@ export function FHIRExport({ result }: { result: AnalysisResult | null }) {
                         className="text-xs w-full justify-center bg-indigo-600 hover:bg-indigo-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 disabled:text-neutral-500 disabled:cursor-not-allowed text-white font-medium px-4 py-2 rounded-md flex items-center gap-1.5 transition-all shadow-sm"
                     >
                         <DownloadCloud className="w-3.5 h-3.5" />
-                        Sync to Axxess EMR
+                        Export PCR Document
                     </button>
                 </div>
             </div>
 
             <div className="flex-1 bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden relative">
                 <div className="absolute top-0 left-0 right-0 bg-neutral-800/80 px-4 py-1.5 text-xs text-neutral-400 font-mono flex items-center justify-between border-b border-neutral-700 backdrop-blur-md">
-                    <span>bundle.json</span>
-                    <span className="text-[10px] text-green-400 bg-green-900/30 px-2 py-0.5 rounded uppercase tracking-wider">Valid FHIR R4</span>
+                    <span>pcr_narrative.txt</span>
+                    <span className="text-[10px] text-blue-400 bg-blue-900/30 px-2 py-0.5 rounded uppercase tracking-wider">PCR Narrative</span>
                 </div>
-                <div className="h-auto overflow-x-auto pt-8 p-4">
-                    <pre className="text-sm font-mono text-emerald-400 whitespace-pre-wrap word-break pb-4">
-                        {jsonString}
-                    </pre>
+                <div className="h-auto overflow-y-auto pt-10 pb-4 px-4 max-h-[500px]">
+                    <p className="text-sm font-sans text-neutral-100 whitespace-pre-wrap leading-relaxed">
+                        {reportText}
+                    </p>
                 </div>
             </div>
         </div>

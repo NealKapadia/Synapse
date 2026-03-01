@@ -1,145 +1,37 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
 import { AnalysisResult } from "@/lib/types";
-import { Stethoscope, Activity, Pill, AlertCircle, HeartPulse, UserCircle, Volume2, VolumeX, Smartphone, Check, Bot } from "lucide-react";
-import toast from "react-hot-toast";
+import { Stethoscope, Activity, Pill, AlertCircle, HeartPulse, Bot } from "lucide-react";
 
 interface StructuredDataProps {
     result: AnalysisResult | null;
-    onLanguageChange?: (language: string) => void;
     isAnalyzing?: boolean;
 }
 
-export function StructuredData({ result, onLanguageChange, isAnalyzing }: StructuredDataProps) {
-    const [isSmsSending, setIsSmsSending] = useState(false);
-    const [phoneNumber, setPhoneNumber] = useState("");
-    const [selectedLanguage, setSelectedLanguage] = useState("English");
-    const [isPlaying, setIsPlaying] = useState(false);
-
-    useEffect(() => {
-        // Pre-load voices for some browsers
-        const loadVoices = () => {
-            window.speechSynthesis.getVoices();
-        };
-        loadVoices();
-        if (window.speechSynthesis.onvoiceschanged !== undefined) {
-            window.speechSynthesis.onvoiceschanged = loadVoices;
-        }
-
-        return () => {
-            if (window.speechSynthesis) {
-                window.speechSynthesis.cancel();
-            }
-        };
-    }, []);
-
-    const playAudio = () => {
-        if (!window.speechSynthesis) {
-            toast.error("Text-to-speech is not supported in this browser.");
-            return;
-        }
-
-        // Toggle playback: if currently playing, cancel it
-        if (isPlaying) {
-            window.speechSynthesis.cancel();
-            setIsPlaying(false);
-            return;
-        }
-
-        if (!result?.patientSummary) return;
-
-        // Ensure clean state
-        window.speechSynthesis.cancel();
-
-        const voiceMap: Record<string, string> = {
-            "English": "en-US",
-            "Spanish": "es-ES",
-            "Mandarin": "zh-CN",
-            "Vietnamese": "vi-VN"
-        };
-
-        const targetLang = voiceMap[selectedLanguage] || "en-US";
-        const utterance = new SpeechSynthesisUtterance(result.patientSummary);
-        utterance.lang = targetLang;
-
-        // Attempt to find a specific voice to improve reliability
-        const voices = window.speechSynthesis.getVoices();
-        const voice = voices.find(v => v.lang.startsWith(targetLang) || v.lang.startsWith(targetLang.split('-')[0]));
-        if (voice) {
-            utterance.voice = voice;
-        }
-
-        utterance.onstart = () => setIsPlaying(true);
-        utterance.onend = () => setIsPlaying(false);
-        utterance.onerror = (e: any) => {
-            if (e?.error !== "interrupted" && e?.error !== "canceled") {
-                console.error("TTS Error:", e);
-                toast.error("Audio playback failed.");
-            }
-            setIsPlaying(false);
-        };
-
-        window.speechSynthesis.speak(utterance);
-    };
-
-    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const cleaned = e.target.value.replace(/\D/g, '').substring(0, 10);
-        let formatted = cleaned;
-        if (cleaned.length > 6) {
-            formatted = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
-        } else if (cleaned.length > 3) {
-            formatted = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}`;
-        } else if (cleaned.length > 0) {
-            formatted = `(${cleaned}`;
-        }
-        setPhoneNumber(formatted);
-    };
-
-    const handleSms = async () => {
-        const cleanedNumber = phoneNumber.replace(/\D/g, '');
-        if (cleanedNumber.length !== 10) {
-            toast.error("Please enter a valid 10-digit phone number.");
-            return;
-        }
-
-        setIsSmsSending(true);
-        try {
-            const response = await fetch("/api/sms", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    phoneNumber: `+1${cleanedNumber}`,
-                    messageBody: result?.patientSummary
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || "Failed to send SMS");
-            }
-
-            toast.success("Recovery plan successfully sent to patient's mobile device.");
-            setPhoneNumber(""); // clear input after success
-        } catch (error: any) {
-            console.error("SMS Error:", error);
-            toast.error(error.message || "Failed to send SMS.");
-        } finally {
-            setIsSmsSending(false);
-        }
-    };
-
+export function StructuredData({ result, isAnalyzing }: StructuredDataProps) {
     if (!result) {
         return (
-            <div className="flex-1 flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 min-h-0">
-                <Activity className="w-12 h-12 mb-3 opacity-20" />
-                <p className="text-sm">Awaiting transcript analysis...</p>
+            <div className="flex-1 flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 min-h-0 relative">
+                {isAnalyzing ? (
+                    <Activity className="w-12 h-12 mb-3 opacity-50 animate-spin text-blue-500" />
+                ) : (
+                    <Activity className="w-12 h-12 mb-3 opacity-20" />
+                )}
+                <p className="text-sm">{isAnalyzing ? "Analyzing..." : "Awaiting transcript analysis..."}</p>
             </div>
         );
     }
 
     return (
-        <div className="flex-1 pr-2 space-y-6">
+        <div className="flex-1 pr-2 space-y-6 relative">
+            {isAnalyzing && (
+                <div className="absolute inset-0 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[1px] flex items-center justify-center z-10 transition-all rounded-xl">
+                    <div className="flex flex-col items-center">
+                        <Activity className="w-8 h-8 text-blue-600 animate-spin mb-2" />
+                        <span className="text-sm font-medium text-blue-600">Analyzing...</span>
+                    </div>
+                </div>
+            )}
 
             {/* Vitals & Symptoms Grid */}
             <div className="grid grid-cols-2 gap-4">
@@ -246,7 +138,7 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
             {result.agentic_follow_ups && result.agentic_follow_ups.length > 0 && (
                 <div className="bg-fuchsia-50 dark:bg-fuchsia-900/10 rounded-xl p-5 border border-fuchsia-200 dark:border-fuchsia-800 shadow-sm relative overflow-hidden mt-4">
                     <div className="flex items-center gap-2 mb-3 text-fuchsia-800 dark:text-fuchsia-300 font-semibold text-lg border-b border-fuchsia-200/50 dark:border-fuchsia-800/30 pb-3">
-                        <Bot className="w-6 h-6" /> Agentic Insights: Recommended Follow-ups
+                        <Bot className="w-6 h-6" /> EMT Field Insights: Suggested Interview Questions
                     </div>
                     <ul className="list-disc pl-5 space-y-2 text-sm text-fuchsia-900 dark:text-fuchsia-100/90 leading-relaxed">
                         {result.agentic_follow_ups.map((q, idx) => (
@@ -255,71 +147,6 @@ export function StructuredData({ result, onLanguageChange, isAnalyzing }: Struct
                     </ul>
                 </div>
             )}
-
-            <div className="bg-violet-50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-900/30 rounded-xl p-5 mt-4 relative">
-                {isAnalyzing && (
-                    <div className="absolute inset-0 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-[1px] rounded-xl flex items-center justify-center z-10 transition-all">
-                        <Activity className="w-6 h-6 text-violet-600 animate-spin" />
-                    </div>
-                )}
-                <div className="flex items-center justify-between mb-3 border-b border-violet-200/50 dark:border-violet-800/30 pb-3">
-                    <div className="flex items-center gap-2 text-violet-800 dark:text-violet-300 font-semibold text-lg">
-                        <UserCircle className="w-6 h-6" /> Patient-Friendly Recovery Plan
-                    </div>
-                    <div className="flex items-center gap-2">
-                        {onLanguageChange && (
-                            <select
-                                value={selectedLanguage}
-                                className="bg-white dark:bg-neutral-800 border border-violet-200 dark:border-violet-800 rounded-md text-sm px-2 py-1 text-neutral-800 dark:text-neutral-200 disabled:opacity-50 cursor-pointer shadow-sm outline-none focus:ring-2 focus:ring-violet-500"
-                                onChange={(e) => {
-                                    setSelectedLanguage(e.target.value);
-                                    onLanguageChange(e.target.value);
-                                }}
-                                disabled={isAnalyzing}
-                            >
-                                <option value="English">English</option>
-                                <option value="Spanish">Spanish</option>
-                                <option value="Mandarin">Mandarin</option>
-                                <option value="Vietnamese">Vietnamese</option>
-                            </select>
-                        )}
-                        <button
-                            onClick={playAudio}
-                            disabled={isAnalyzing}
-                            className="p-1.5 bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300 rounded-md hover:bg-violet-200 dark:hover:bg-violet-800/80 transition-colors disabled:opacity-50"
-                            title={isPlaying ? "Stop audio" : "Play read aloud"}
-                        >
-                            {isPlaying ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                        </button>
-                    </div>
-                </div>
-                <p className="text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm whitespace-pre-wrap mb-4">
-                    {result.patientSummary}
-                </p>
-                <div className="flex flex-col items-end gap-2 border-t border-violet-200/50 dark:border-violet-800/30 pt-3">
-                    <button
-                        onClick={handleSms}
-                        disabled={isSmsSending || isAnalyzing || !phoneNumber.trim()}
-                        className="text-xs bg-violet-600 hover:bg-violet-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 disabled:text-neutral-500 text-white font-medium px-4 py-1.5 rounded-md flex items-center justify-center gap-1.5 transition-colors shadow-sm w-40"
-                    >
-                        {isSmsSending ? (
-                            <Activity className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                            <Smartphone className="w-3.5 h-3.5" />
-                        )}
-                        {isSmsSending ? "Sending..." : "SMS Plan"}
-                    </button>
-                    <input
-                        type="tel"
-                        placeholder="+1 (555) 000-0000"
-                        value={phoneNumber}
-                        onChange={handlePhoneChange}
-                        disabled={isAnalyzing || isSmsSending}
-                        className="bg-white dark:bg-neutral-800 border border-violet-200 dark:border-violet-800 rounded-md text-xs px-2 py-1.5 text-neutral-800 dark:text-neutral-200 disabled:opacity-50 outline-none focus:ring-2 focus:ring-violet-500 w-40 shadow-sm text-center placeholder:text-neutral-400"
-                    />
-                </div>
-            </div>
-
         </div>
     );
 }
