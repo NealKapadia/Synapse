@@ -3,7 +3,7 @@ import { DATA_EXTRACTION_PROMPT, PCR_GENERATION_PROMPT } from "@/lib/featherless
 
 const FEATHERLESS_API_URL = "https://api.featherless.ai/v1/chat/completions";
 const API_KEY = process.env.FEATHERLESS_API_KEY || "";
-const MODEL = "mistralai/Mistral-Nemo-Instruct-2407"; // 12B parameter Mistral model
+const MODEL = "Qwen/Qwen2.5-72B-Instruct"; // 72B parameter Qwen model for deep EMS reasoning
 
 function cleanJSON(content: string) {
     let clean = content.trim();

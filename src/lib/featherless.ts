@@ -26,9 +26,11 @@ You MUST return your response as a single, valid JSON object with EXACTLY the fo
 }
 
 Important Rules:
-- If a value is not mentioned in the transcript, omit it from the array or set the object key to null (for vitals).
-- When determining "is_abnormal" for vitals, use standard clinical bounds (e.g., HR > 100 or < 60 is abnormal, BP > 120/80 is abnormal, SpO2 < 92 is abnormal).
+- Enforce First Responder protocols: Recommend specific EMS field assessments (e.g., if stroke is suspected, recommend the FAST protocol and determine 'Last Known Normal'. If trauma, recommend MARCH or ATLS surveys).
 - If SpO2 is less than 92%, explicitly add "Administer Oxygen" to the treatments array.
+- When determining "is_abnormal" for vitals, use standard clinical bounds (e.g., HR > 100 or < 60 is abnormal, BP > 120/80 is abnormal, SpO2 < 92 is abnormal).
+- The "agentic_follow_ups" array MUST contain exactly 5 short, critical bullet points detailing the exact interview questions the EMT should ask next to close diagnostic gaps.
+- If a value is not mentioned in the transcript, omit it from the array or set the object key to null (for vitals).
 - DO NOT INCLUDE ANY OUTSIDE TEXT, ONLY RETURN VALID JSON.`;
 
 export const PCR_GENERATION_PROMPT = `You are a seasoned paramedic and AI assistant.
