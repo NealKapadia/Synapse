@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DATA_EXTRACTION_PROMPT, PCR_GENERATION_PROMPT } from "@/lib/featherless";
 
+export const maxDuration = 60; // Allow sufficient time for LLM generation
 const FEATHERLESS_API_URL = "https://api.featherless.ai/v1/chat/completions";
 const API_KEY = process.env.FEATHERLESS_API_KEY || "";
-const MODEL = "Qwen/Qwen2.5-72B-Instruct"; // 72B parameter Qwen model for deep EMS reasoning
+const MODEL = "Qwen/Qwen2.5-32B-Instruct"; // 32B model provides maximum reliability and depth without timing out
 
 function cleanJSON(content: string) {
     let clean = content.trim();

@@ -1,6 +1,6 @@
 const FEATHERLESS_API_URL = "https://api.featherless.ai/v1/chat/completions";
 const API_KEY = "rc_1f6a9735be08501c70566ad7a1e86000191bbaf6d6345aa3ac51590442651a1f";
-const MODEL = "mistralai/Mistral-Nemo-Instruct-2407";
+const MODEL = "Qwen/Qwen2.5-72B-Instruct";
 
 const DATA_EXTRACTION_PROMPT = `You are an expert AI clinical diagnostic assistant.
 Your task is to analyze the provided patient-clinician transcript and extract structured medical data into a minimal, flat JSON object.
@@ -33,26 +33,26 @@ Important Rules:
 - DO NOT INCLUDE ANY OUTSIDE TEXT, ONLY RETURN VALID JSON.`;
 
 async function test() {
-    const text = "[Transcribed from Cardiac.wav]\n\n Good morning, I've been reviewing your chart. You mentioned having some chest heaviness and palpitations lately. Yes, Doctor, it feels like a weight is sitting on my chest and my heart starts racing even when I'm just watching TV. I'm sorry to hear that. Your blood pressure is 142 over 90 today and your heart rate is currently 102. Your oxygen is fine at 96% due to the family history of heart disease. Actually, my father had a heart attack when he was exactly my age. I'm pretty worried about it.";
+  const text = "[Transcribed from Cardiac.wav]\n\n Good morning, I've been reviewing your chart. You mentioned having some chest heaviness and palpitations lately. Yes, Doctor, it feels like a weight is sitting on my chest and my heart starts racing even when I'm just watching TV. I'm sorry to hear that. Your blood pressure is 142 over 90 today and your heart rate is currently 102. Your oxygen is fine at 96% due to the family history of heart disease. Actually, my father had a heart attack when he was exactly my age. I'm pretty worried about it.";
 
-    const res = await fetch(FEATHERLESS_API_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${API_KEY}`,
-        },
-        body: JSON.stringify({
-            model: MODEL,
-            messages: [
-                { role: "system", content: DATA_EXTRACTION_PROMPT },
-                { role: "user", content: `Here is the transcript:\n\n${text}` }
-            ],
-            temperature: 0.1,
-        })
-    });
+  const res = await fetch(FEATHERLESS_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      messages: [
+        { role: "system", content: DATA_EXTRACTION_PROMPT },
+        { role: "user", content: `Here is the transcript:\n\n${text}` }
+      ],
+      temperature: 0.1,
+    })
+  });
 
-    const data = await res.json();
-    console.log(data.choices[0].message.content);
+  const data = await res.json();
+  console.log(data);
 }
 
 test();
