@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { OpenAI } from "openai";
 import { DATA_EXTRACTION_PROMPT, PCR_GENERATION_PROMPT } from "@/lib/featherless";
 
 export const maxDuration = 60; // Allow sufficient time for LLM generation
-const FEATHERLESS_API_URL = "https://api.featherless.ai/v1/chat/completions";
-const API_KEY = process.env.FEATHERLESS_API_KEY || "";
-const MODEL = "Qwen/Qwen2.5-32B-Instruct"; // 32B model provides maximum reliability and depth without timing out
+
+// Initialize the OpenAI Client pointing to the Azure API
+const client = new OpenAI({
+    baseURL: process.env.AZURE_OPENAI_ENDPOINT ? `${process.env.AZURE_OPENAI_ENDPOINT.replace(/\/$/, '')}/openai/v1` : undefined,
+    apiKey: process.env.AZURE_OPENAI_API_KEY,
+    defaultHeaders: {
+        "api-key": process.env.AZURE_OPENAI_API_KEY, // Ensure Azure key header is sent just in case
+    }
+});
 
 function cleanJSON(content: string) {
     let clean = content.trim();
@@ -26,29 +33,18 @@ export async function POST(req: NextRequest) {
         const pcrPromptContent = PCR_GENERATION_PROMPT;
 
         const callApi = async (systemContent: string) => {
-            const res = await fetch(FEATHERLESS_API_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${API_KEY}`,
-                },
-                body: JSON.stringify({
-                    model: MODEL,
-                    messages: [
-                        { role: "system", content: systemContent },
-                        { role: "user", content: `Here is the transcript:\n\n${text}` }
-                    ],
-                    temperature: 0.1,
-                })
+            const response = await client.chat.completions.create({
+                model: process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "synapse-gpt4o-mini",
+                messages: [
+                    { role: "system", content: systemContent },
+                    { role: "user", content: `Here is the transcript:\n\n${text}` }
+                ],
+                temperature: 0.1,
+                // This guarantees the model outputs strict JSON
+                response_format: { type: "json_object" },
             });
 
-            if (!res.ok) {
-                const text = await res.text();
-                throw new Error(`API Error: ${res.status} ${text}`);
-            }
-
-            const data = await res.json();
-            return data.choices[0].message.content;
+            return response.choices[0].message.content || "{}";
         };
 
         const [dataResultRaw, pcrResultRaw] = await Promise.all([
