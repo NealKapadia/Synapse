@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from "openai";
-import { DATA_EXTRACTION_PROMPT, PCR_GENERATION_PROMPT } from "@/lib/featherless";
+import { DATA_EXTRACTION_PROMPT, PCR_GENERATION_PROMPT } from "@/lib/prompts";
 
 export const maxDuration = 60; // Allow sufficient time for LLM generation
 
