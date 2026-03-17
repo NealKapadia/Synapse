@@ -4,14 +4,15 @@ import { DATA_EXTRACTION_PROMPT, PCR_GENERATION_PROMPT } from "@/lib/prompts";
 
 export const maxDuration = 60; // Allow sufficient time for LLM generation
 
-// Initialize the OpenAI Client pointing to the Azure API
-const client = new OpenAI({
-    baseURL: process.env.AZURE_OPENAI_ENDPOINT ? `${process.env.AZURE_OPENAI_ENDPOINT.replace(/\/$/, '')}/openai/v1` : undefined,
-    apiKey: process.env.AZURE_OPENAI_API_KEY,
-    defaultHeaders: {
-        "api-key": process.env.AZURE_OPENAI_API_KEY, // Ensure Azure key header is sent just in case
-    }
-});
+function getClient() {
+    return new OpenAI({
+        baseURL: process.env.AZURE_OPENAI_ENDPOINT ? `${process.env.AZURE_OPENAI_ENDPOINT.replace(/\/$/, '')}/openai/v1` : undefined,
+        apiKey: process.env.AZURE_OPENAI_API_KEY,
+        defaultHeaders: {
+            "api-key": process.env.AZURE_OPENAI_API_KEY,
+        }
+    });
+}
 
 function cleanJSON(content: string) {
     let clean = content.trim();
@@ -31,6 +32,8 @@ export async function POST(req: NextRequest) {
 
         const dataPromptContent = DATA_EXTRACTION_PROMPT;
         const pcrPromptContent = PCR_GENERATION_PROMPT;
+
+        const client = getClient();
 
         const callApi = async (systemContent: string) => {
             const response = await client.chat.completions.create({

@@ -1,21 +1,18 @@
 import Image from "next/image";
 
 export function AppLogo() {
-    return (
-        <div className="relative group flex items-center justify-center">
-            {/* Dynamic Glowing Border */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
-
-            {/* Image Container */}
-            <div className="relative bg-white dark:bg-neutral-900 ring-1 ring-neutral-200 dark:ring-neutral-800 p-1.5 rounded-lg flex items-center justify-center overflow-hidden">
-                <Image
-                    src="/Synapse.png"
-                    alt="Synapse Logo"
-                    width={28}
-                    height={28}
-                    className="object-contain"
-                />
-            </div>
-        </div>
-    );
+  return (
+    <div className="relative flex items-center justify-center">
+      <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/30 to-cyan-400/30 rounded-xl blur-md" />
+      <div className="relative bg-white/5 ring-1 ring-white/10 p-1.5 rounded-xl flex items-center justify-center">
+        <Image
+          src="/Synapse.png"
+          alt="Synapse Logo"
+          width={28}
+          height={28}
+          className="object-contain"
+        />
+      </div>
+    </div>
+  );
 }

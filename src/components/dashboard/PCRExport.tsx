@@ -2,91 +2,140 @@
 
 import { useState } from "react";
 import { AnalysisResult } from "@/lib/types";
-import { DownloadCloud, Check, FileText } from "lucide-react";
+import { FileText, X, Check, Copy, Download, Shield } from "lucide-react";
 import toast from "react-hot-toast";
 
-export function PCRExport({ result }: { result: AnalysisResult | null }) {
-    const [copied, setCopied] = useState(false);
-    const [isVerified, setIsVerified] = useState(false);
+interface PCRExportProps {
+  result: AnalysisResult | null;
+}
 
-    if (!result || !result.patientCareReport) {
-        return (
-            <div className="flex-1 flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 min-h-0">
-                <FileText className="w-12 h-12 mb-3 opacity-20" />
-                <p className="text-sm">Patient Care Report (PCR) will appear here.</p>
-            </div>
-        );
-    }
+export function PCRExport({ result }: PCRExportProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
 
-    const reportText = result.patientCareReport;
+  const reportText = result?.patientCareReport || "";
 
-    const handleCopy = () => {
-        navigator.clipboard.writeText(reportText);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-    };
+  const handleCopy = () => {
+    navigator.clipboard.writeText(reportText);
+    setCopied(true);
+    toast.success("PCR copied to clipboard");
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-    const handleDownload = () => {
-        const blob = new Blob([reportText], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `pcr-export-${new Date().toISOString().slice(0, 10)}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        toast.success("Successfully exported PCR.");
-    };
+  const handleDownload = () => {
+    const blob = new Blob([reportText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `pcr-export-${new Date().toISOString().slice(0, 10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("PCR exported successfully");
+  };
 
-    return (
-        <div className="flex-1 flex flex-col">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded-lg border border-neutral-200 dark:border-neutral-700/50">
-                <label className="flex items-center gap-2.5 cursor-pointer group">
-                    <div className="relative flex items-center justify-center">
-                        <input
-                            type="checkbox"
-                            className="peer appearance-none w-5 h-5 border-2 border-neutral-300 dark:border-neutral-600 rounded-md checked:bg-indigo-600 checked:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all cursor-pointer"
-                            checked={isVerified}
-                            onChange={(e) => setIsVerified(e.target.checked)}
-                        />
-                        <Check className="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" strokeWidth={3} />
-                    </div>
-                    <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 group-hover:text-black dark:group-hover:text-white transition-colors select-none">
-                        I, the attending first responder, have reviewed this AI-generated PCR narrative and verify its clinical accuracy in accordance with HIPAA standards.
-                    </span>
+  return (
+    <>
+      {/* Trigger Button */}
+      <button
+        onClick={() => result && setIsOpen(true)}
+        disabled={!result?.patientCareReport}
+        className={`w-full flex items-center justify-center gap-3 px-5 py-3 rounded-2xl text-sm font-medium transition-all ${
+          result?.patientCareReport
+            ? "glass-card glow-teal text-teal-300 hover:bg-white/[0.06] cursor-pointer"
+            : "glass-card text-slate-600 cursor-not-allowed"
+        }`}
+      >
+        <FileText className="w-4 h-4" />
+        Export Patient Care Report
+        {result?.patientCareReport && (
+          <span className="ml-auto w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
+        )}
+      </button>
+
+      {/* Modal Overlay */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center fade-in">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsOpen(false)}
+          />
+
+          {/* Panel */}
+          <div className="relative w-full max-w-4xl max-h-[85vh] mx-4 mb-4 flex flex-col slide-up">
+            <div className="glass-card overflow-hidden flex flex-col" style={{ background: 'rgba(10, 14, 30, 0.95)', backdropFilter: 'blur(40px)' }}>
+              {/* Modal Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-teal-500/15 flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-teal-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-semibold text-white">Patient Care Report</h2>
+                    <p className="text-[10px] text-slate-400">AI-generated PCR narrative</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleCopy}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/5 text-slate-300 hover:bg-white/10 border border-white/[0.06] transition-colors"
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copied ? "Copied" : "Copy"}
+                  </button>
+                  <button
+                    onClick={handleDownload}
+                    disabled={!isVerified}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                      isVerified
+                        ? "bg-teal-500/15 text-teal-300 border-teal-500/20 hover:bg-teal-500/25"
+                        : "bg-white/[0.02] text-slate-600 border-white/5 cursor-not-allowed"
+                    }`}
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    Export
+                  </button>
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Verification Bar */}
+              <div className="px-6 py-3 border-b border-white/[0.04] bg-white/[0.02]">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <div className="relative flex items-center justify-center shrink-0">
+                    <input
+                      type="checkbox"
+                      className="peer appearance-none w-4 h-4 border border-white/20 rounded bg-white/5 checked:bg-teal-500 checked:border-teal-500 transition-all cursor-pointer"
+                      checked={isVerified}
+                      onChange={(e) => setIsVerified(e.target.checked)}
+                    />
+                    <Check className="absolute w-2.5 h-2.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none" strokeWidth={3} />
+                  </div>
+                  <Shield className="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-400 transition-colors" />
+                  <span className="text-[11px] text-slate-400 group-hover:text-slate-300 transition-colors leading-tight">
+                    I, the attending first responder, have reviewed this AI-generated PCR narrative and verify its clinical accuracy.
+                  </span>
                 </label>
+              </div>
 
-                <div className="flex flex-col gap-2 shrink-0 w-full md:w-auto">
-                    <button
-                        onClick={handleCopy}
-                        className="text-xs w-full justify-center bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 font-medium px-4 py-2 rounded-md flex items-center gap-1.5 transition-colors"
-                    >
-                        {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <FileText className="w-3.5 h-3.5" />}
-                        {copied ? "Copied!" : "Copy PCR"}
-                    </button>
-                    <button
-                        onClick={handleDownload}
-                        disabled={!isVerified}
-                        className="text-xs w-full justify-center bg-indigo-600 hover:bg-indigo-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 disabled:text-neutral-500 disabled:cursor-not-allowed text-white font-medium px-4 py-2 rounded-md flex items-center gap-1.5 transition-all shadow-sm"
-                    >
-                        <DownloadCloud className="w-3.5 h-3.5" />
-                        Export PCR Document
-                    </button>
+              {/* PCR Content */}
+              <div className="flex-1 overflow-y-auto p-6 max-h-[60vh]">
+                <div className="font-mono text-xs text-slate-300 whitespace-pre-wrap leading-relaxed">
+                  {reportText}
                 </div>
+              </div>
             </div>
-
-            <div className="flex-1 bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden relative">
-                <div className="absolute top-0 left-0 right-0 bg-neutral-800/80 px-4 py-1.5 text-xs text-neutral-400 font-mono flex items-center justify-between border-b border-neutral-700 backdrop-blur-md">
-                    <span>pcr_narrative.txt</span>
-                    <span className="text-[10px] text-blue-400 bg-blue-900/30 px-2 py-0.5 rounded uppercase tracking-wider">PCR Narrative</span>
-                </div>
-                <div className="h-auto overflow-y-auto pt-10 pb-4 px-4 max-h-[500px]">
-                    <p className="text-sm font-sans text-neutral-100 whitespace-pre-wrap leading-relaxed">
-                        {reportText}
-                    </p>
-                </div>
-            </div>
+          </div>
         </div>
-    );
+      )}
+    </>
+  );
 }

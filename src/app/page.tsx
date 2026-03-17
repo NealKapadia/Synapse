@@ -5,7 +5,9 @@ import { FileUpload } from "@/components/audio/FileUpload";
 import { LiveMic } from "@/components/audio/LiveMic";
 import { Scenarios } from "@/components/dashboard/Scenarios";
 import { TranscriptPanel } from "@/components/dashboard/TranscriptPanel";
-import { StructuredData } from "@/components/dashboard/StructuredData";
+import { VitalsPanel } from "@/components/dashboard/VitalsPanel";
+import { DiagnosesPanel } from "@/components/dashboard/DiagnosesPanel";
+import { FollowUpsPanel } from "@/components/dashboard/FollowUpsPanel";
 import { PCRExport } from "@/components/dashboard/PCRExport";
 import { AppLogo } from "@/components/dashboard/AppLogo";
 import { AnalysisResult } from "@/lib/types";
@@ -28,7 +30,7 @@ export default function Home() {
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: transcript, language })
+        body: JSON.stringify({ text: transcript, language }),
       });
 
       if (!response.ok) {
@@ -47,64 +49,88 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 flex flex-col font-sans">
-      <header className="bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 p-4 sticky top-0 z-10 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-4">
+    <div className="h-screen flex flex-col bg-synapse overflow-hidden">
+      {/* ── Header ── */}
+      <header className="shrink-0 h-14 px-6 flex items-center justify-between border-b border-white/[0.06] bg-white/[0.02] backdrop-blur-xl">
+        <div className="flex items-center gap-3">
           <AppLogo />
-          <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-cyan-500 dark:from-blue-400 dark:to-cyan-300">Synapse: The AI Second Responder</h1>
+          <div className="flex items-baseline gap-2">
+            <h1 className="text-sm font-semibold text-white tracking-tight">Synapse</h1>
+            <span className="text-[10px] text-slate-500 font-medium">AI Second Responder</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[10px] text-slate-400 font-medium">System Online</span>
+          </div>
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
-        {/* Left Column: Input Methods */}
-        <section className="col-span-1 lg:col-span-3 space-y-6">
-          <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700">
-            <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4">Select Scenario</h2>
+      {/* ── Bento Grid ── */}
+      <main className="flex-1 min-h-0 p-3 grid grid-cols-12 grid-rows-[1fr_1fr_auto] gap-3">
+        {/* ── Zone A: Left Column (Audio + Scenarios + Transcript) ── */}
+        <section className="col-span-4 row-span-2 flex flex-col gap-3 min-h-0">
+          {/* Audio Controls */}
+          <div className="glass-card p-4 shrink-0">
+            <div className="section-label mb-3">Audio Input</div>
+            <div className="flex gap-2 mb-2">
+              <div className="flex-1">
+                <LiveMic onTranscript={handleTranscript} />
+              </div>
+            </div>
+            <FileUpload onTranscript={handleTranscript} />
+
+            {/* Waveform visualization */}
+            <div className="mt-3 flex items-end justify-center gap-[3px] h-6">
+              {Array.from({ length: 24 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="w-[2px] bg-blue-400/30 rounded-full waveform-bar"
+                  style={{
+                    animationDelay: `${i * 0.05}s`,
+                    height: "20%",
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Scenarios */}
+          <div className="glass-card p-4 shrink-0">
+            <div className="section-label mb-2">Demo Scenarios</div>
             <Scenarios onSelectScenario={handleTranscript} />
           </div>
 
-          <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700">
-            <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4">Audio Input</h2>
-            <div className="space-y-4">
-              <LiveMic onTranscript={handleTranscript} />
-              <div className="relative flex items-center py-2">
-                <div className="flex-grow border-t border-neutral-300 dark:border-neutral-600"></div>
-                <span className="flex-shrink-0 mx-4 text-neutral-400 text-xs">OR</span>
-                <div className="flex-grow border-t border-neutral-300 dark:border-neutral-600"></div>
-              </div>
-              <FileUpload onTranscript={handleTranscript} />
-            </div>
+          {/* Transcript */}
+          <div className="flex-1 min-h-0">
+            <TranscriptPanel
+              transcript={transcript}
+              onChange={setTranscript}
+              onAnalyze={() => handleAnalyze("English")}
+              isAnalyzing={isAnalyzing}
+            />
           </div>
         </section>
 
-        {/* Middle Column: Raw Transcript & Analysis */}
-        <section className="col-span-1 lg:col-span-3 space-y-6 flex flex-col">
-          <TranscriptPanel
-            transcript={transcript}
-            onChange={setTranscript}
-            onAnalyze={() => handleAnalyze("English")}
-            isAnalyzing={isAnalyzing}
-          />
+        {/* ── Zone B: Vitals (Top Right) ── */}
+        <section className="col-span-4 row-span-1 min-h-0">
+          <VitalsPanel result={analysisResult} isAnalyzing={isAnalyzing} />
         </section>
 
-        {/* Third Column: Extracted Data */}
-        <section className="col-span-1 lg:col-span-3 flex flex-col gap-6">
-          <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 flex flex-col h-fit">
-            <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4 border-b border-neutral-200 dark:border-neutral-700 pb-2">Structured Medical Data</h2>
-            <div className="pr-2">
-              <StructuredData result={analysisResult} isAnalyzing={isAnalyzing} />
-            </div>
-          </div>
+        {/* ── Zone C: Diagnoses (Middle Right) ── */}
+        <section className="col-span-4 row-span-2 min-h-0">
+          <DiagnosesPanel result={analysisResult} isAnalyzing={isAnalyzing} />
         </section>
 
-        {/* Fourth Column: PCR */}
-        <section className="col-span-1 lg:col-span-3 flex flex-col gap-6">
-          <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 flex flex-col h-full flex-1">
-            <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4 border-b border-neutral-200 dark:border-neutral-700 pb-2">Patient Care Report (PCR) Export</h2>
-            <div className="overflow-y-auto pr-2">
-              <PCRExport result={analysisResult} />
-            </div>
-          </div>
+        {/* ── Zone D: Follow-ups (Bottom of middle) ── */}
+        <section className="col-span-4 row-span-1 min-h-0">
+          <FollowUpsPanel result={analysisResult} isAnalyzing={isAnalyzing} />
+        </section>
+
+        {/* ── Zone E: PCR Export (Bottom Span) ── */}
+        <section className="col-span-12 row-span-1 shrink-0">
+          <PCRExport result={analysisResult} />
         </section>
       </main>
     </div>
