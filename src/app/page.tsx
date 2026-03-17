@@ -17,7 +17,7 @@ import { AppLogo } from "@/components/dashboard/AppLogo";
 import { AnalysisResult } from "@/lib/types";
 import toast from "react-hot-toast";
 
-const POLL_INTERVAL = 15_000;
+const POLL_INTERVAL = 7_000;
 
 const panelVariants = {
   hidden: { opacity: 0, y: 16 },
@@ -68,7 +68,7 @@ export default function Home() {
     }
   }, []);
 
-  // 15-second polling when recording is active
+  // 7-second polling when recording is active
   useEffect(() => {
     if (!isRecording) return;
 
@@ -128,7 +128,7 @@ export default function Home() {
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-red-400" />
                   </span>
                   <span className="text-[11px] text-red-300 font-semibold">AI Active</span>
-                  <span className="text-[9px] text-red-400/60 font-mono">10s poll</span>
+                  <span className="text-[9px] text-red-400/60 font-mono">7s poll</span>
                 </motion.div>
               )}
             </AnimatePresence>
