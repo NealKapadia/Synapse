@@ -53,7 +53,7 @@ Important Rules:
 - Ensure treatments are highly specific, actionable, and lack medical abbreviations (e.g., use "intravenous" not "IV").
 - If SpO2 < 90%, explicitly add "Administer Oxygen" to treatments.
 - For vitals, keep track of ALL measurements. If multiple readings of the same vital sign are provided over time, string them together chronologically (e.g., "120/80 initially, then 90/60"). If the EMT explicitly corrects a value or says "ignore that last vital sign", USE ONLY the corrected values.
-- Use standard clinical bounds for is_abnormal (HR > 100 or < 60, BP systolic > 140 or < 90, SpO2 < 90, RR > 20 or < 12).
+- Use standard clinical bounds for is_abnormal (HR > 100 or HR < 60, BP systolic > 140 or < 90, SpO2 < 90, RR > 20 or < 12). Normal heart rate is 60-100 bpm.
 - agentic_follow_ups MUST contain exactly 3 short, critical interview questions that are relevant and immediately impact life-threat decisions.
 - If a value is not mentioned, omit it or set to null.
 - DO NOT INCLUDE ANY OUTSIDE TEXT, ONLY RETURN VALID JSON.`;
