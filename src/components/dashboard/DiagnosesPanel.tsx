@@ -44,47 +44,47 @@ export function DiagnosesPanel({ result, isAnalyzing }: DiagnosesPanelProps) {
 
   return (
     <div className="glass p-5 h-full">
-      <p className="section-label mb-3 flex items-center gap-2">
-        <Stethoscope className="w-3 h-3" />
+      <p className="section-label mb-4 flex items-center gap-2 text-base">
+        <Stethoscope className="w-4 h-4 text-teal-400" />
         Diagnoses & ICD-10
       </p>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {diagnoses.map((d, i) => {
           const colors = confidenceColor(d.confidence_score);
           return (
             <TiltCard
               key={i}
-              className={`glass-inner p-3 space-y-2 fade-in stagger-${Math.min(i + 1, 6)}`}
+              className={`glass-inner p-4 space-y-3 fade-in stagger-${Math.min(i + 1, 6)} shadow-lg border border-white/10 hover:border-white/20 transition-all`}
             >
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-semibold text-white">{d.condition_name}</p>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo-500/12 text-indigo-300 border border-indigo-500/15">
-                      {d.icd_10_code}
+                  <div className="flex flex-col gap-2">
+                    <p className="text-lg md:text-xl font-bold text-white tracking-wide">{d.condition_name}</p>
+                    <span className="text-xs font-mono px-2.5 py-1 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/20 w-fit font-medium">
+                      ICD-10: {d.icd_10_code}
                     </span>
                   </div>
                 </div>
                 {d.confidence_score !== undefined && (
-                  <div className="flex items-center gap-2 shrink-0">
-                    <div className={`w-16 h-1.5 bg-white/5 rounded-full overflow-hidden ${colors.glow}`}>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <span className={`text-xl font-black tabular-nums ${colors.text} ${colors.glow} drop-shadow-md`}>
+                      {d.confidence_score}%
+                    </span>
+                    <div className={`w-20 h-2 bg-white/5 rounded-full overflow-hidden`}>
                       <div
                         className={`h-full rounded-full transition-all duration-1000 ease-out ${colors.bar}`}
                         style={{ width: `${d.confidence_score}%` }}
                       />
                     </div>
-                    <span className={`text-sm font-bold tabular-nums ${colors.text}`}>
-                      {d.confidence_score}%
-                    </span>
                   </div>
                 )}
               </div>
               {d.differential_diagnoses && d.differential_diagnoses.length > 0 && (
-                <div className="flex flex-wrap gap-1 pt-1.5 border-t border-white/[0.04]">
-                  <span className="text-[9px] text-slate-500 uppercase tracking-wider font-medium mr-1 self-center">DDx:</span>
+                <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/[0.06]">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold mr-1 self-center">Differential:</span>
                   {d.differential_diagnoses.map((diff, idx) => (
-                    <span key={idx} className="text-[10px] px-1.5 py-0.5 rounded-md bg-white/[0.03] text-slate-400 border border-white/[0.04]">
+                    <span key={idx} className="text-[11px] px-2 py-0.5 rounded-md bg-white/[0.04] text-slate-300 border border-white/[0.06]">
                       {diff}
                     </span>
                   ))}
@@ -96,19 +96,19 @@ export function DiagnosesPanel({ result, isAnalyzing }: DiagnosesPanelProps) {
       </div>
 
       {treatments.length > 0 && (
-        <div className="mt-4 pt-3 border-t border-white/[0.04]">
-          <p className="section-label mb-2 flex items-center gap-2">
-            <Pill className="w-3 h-3" />
-            Treatments
+        <div className="mt-5 pt-4 border-t border-white/[0.06]">
+          <p className="section-label mb-3 flex items-center gap-2 text-base">
+            <Pill className="w-4 h-4 text-emerald-400" />
+            Recommended Treatments
           </p>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-col gap-2">
             {treatments.map((t, i) => (
-              <span
+              <div
                 key={i}
-                className={`text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/8 text-emerald-300 border border-emerald-500/15 font-medium fade-in stagger-${Math.min(i + 1, 6)}`}
+                className={`text-sm px-3.5 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-medium fade-in leading-relaxed stagger-${Math.min(i + 1, 6)}`}
               >
-                {t}
-              </span>
+                • {t}
+              </div>
             ))}
           </div>
         </div>

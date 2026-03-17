@@ -67,6 +67,10 @@ export function LiveMic({ onTranscript, onRecordingChange }: LiveMicProps) {
       if (event.error === "not-allowed") {
         toast.error("Microphone access denied. Please allow microphone access in your browser settings.");
         shouldRestartRef.current = false;
+      } else if (event.error === "network") {
+        toast.error("Microphone Network Error: The browser failed to connect to speech services. Please check your internet connection and try again.");
+        setIsRecording(false);
+        shouldRestartRef.current = false;
       } else if (event.error === "no-speech") {
         // Silence detected - auto-restart if still recording
       } else if (event.error === "aborted") {
@@ -136,11 +140,10 @@ export function LiveMic({ onTranscript, onRecordingChange }: LiveMicProps) {
     <button
       type="button"
       onClick={toggleRecording}
-      className={`w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl text-sm font-semibold transition-all min-h-[48px] ${
-        isRecording
+      className={`w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl text-sm font-semibold transition-all min-h-[48px] ${isRecording
           ? "bg-red-500/12 text-red-300 border border-red-500/20 glow-red"
           : "bg-gradient-to-r from-blue-500/15 to-cyan-500/15 text-blue-300 border border-blue-500/15 hover:from-blue-500/25 hover:to-cyan-500/25 glow-blue"
-      }`}
+        }`}
     >
       {isRecording ? (
         <>
