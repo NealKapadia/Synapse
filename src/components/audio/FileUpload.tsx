@@ -25,15 +25,8 @@ export function FileUpload({ onTranscript }: FileUploadProps) {
   const [fileName, setFileName] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
+  const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); setIsDragging(true); };
+  const handleDragLeave = (e: React.DragEvent) => { e.preventDefault(); setIsDragging(false); };
 
   const processFile = async (file: File) => {
     if (!file.type.includes("audio")) {
@@ -80,15 +73,11 @@ export function FileUpload({ onTranscript }: FileUploadProps) {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      processFile(e.dataTransfer.files[0]);
-    }
+    if (e.dataTransfer.files?.length) processFile(e.dataTransfer.files[0]);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      processFile(e.target.files[0]);
-    }
+    if (e.target.files?.length) processFile(e.target.files[0]);
   };
 
   return (
@@ -97,38 +86,32 @@ export function FileUpload({ onTranscript }: FileUploadProps) {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       onClick={() => inputRef.current?.click()}
-      className={`border border-dashed rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all text-center ${
+      className={`border border-dashed rounded-xl p-5 flex flex-col items-center justify-center cursor-pointer transition-all text-center ${
         isDragging
-          ? "border-blue-400/40 bg-blue-500/5"
-          : "border-white/10 hover:border-white/20 hover:bg-white/[0.02]"
+          ? "border-blue-400/30 bg-blue-500/5"
+          : "border-white/8 hover:border-white/15 hover:bg-white/[0.02]"
       }`}
     >
-      <input
-        type="file"
-        ref={inputRef}
-        className="hidden"
-        accept="audio/*"
-        onChange={handleChange}
-      />
+      <input type="file" ref={inputRef} className="hidden" accept="audio/*" onChange={handleChange} />
 
       {isProcessing ? (
-        <div className="flex flex-col items-center py-1">
-          <div className="w-5 h-5 rounded-full border-2 border-blue-400 border-t-transparent animate-spin mb-2" />
-          <p className="text-[10px] font-medium text-blue-300">
-            {progress > 0 && progress < 50 ? "Decoding..." : "Transcribing..."}
+        <div className="flex flex-col items-center py-2">
+          <div className="w-6 h-6 rounded-full border-2 border-blue-400 border-t-transparent animate-spin mb-2" />
+          <p className="text-xs font-medium text-blue-300">
+            {progress > 0 && progress < 50 ? "Decoding audio..." : "Transcribing with Whisper AI..."}
           </p>
         </div>
       ) : fileName ? (
-        <div className="flex flex-col items-center py-1 text-emerald-400">
-          <CheckCircle2 className="w-5 h-5 mb-1" />
-          <p className="text-[10px] font-medium truncate max-w-full">{fileName}</p>
-          <p className="text-[9px] text-slate-500 mt-0.5">Click to upload another</p>
+        <div className="flex flex-col items-center py-2 text-emerald-400">
+          <CheckCircle2 className="w-6 h-6 mb-1.5" />
+          <p className="text-xs font-medium truncate max-w-full">{fileName}</p>
+          <p className="text-[10px] text-slate-500 mt-1">Click or drag to upload another</p>
         </div>
       ) : (
-        <div className="flex flex-col items-center py-1">
-          <UploadCloud className="w-5 h-5 text-slate-500 mb-1.5" />
-          <p className="text-[10px] font-medium text-slate-300">Upload Audio</p>
-          <p className="text-[9px] text-slate-600">.mp3 or .wav</p>
+        <div className="flex flex-col items-center py-2">
+          <UploadCloud className="w-6 h-6 text-slate-500 mb-2" />
+          <p className="text-xs font-semibold text-slate-300">Upload Audio File</p>
+          <p className="text-[10px] text-slate-600 mt-1">Drag & drop or click &middot; .mp3, .wav</p>
         </div>
       )}
     </div>

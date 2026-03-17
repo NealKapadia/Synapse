@@ -5,9 +5,11 @@ import { FileUpload } from "@/components/audio/FileUpload";
 import { LiveMic } from "@/components/audio/LiveMic";
 import { Scenarios } from "@/components/dashboard/Scenarios";
 import { TranscriptPanel } from "@/components/dashboard/TranscriptPanel";
+import { SeverityGauge } from "@/components/dashboard/SeverityGauge";
 import { VitalsPanel } from "@/components/dashboard/VitalsPanel";
 import { DiagnosesPanel } from "@/components/dashboard/DiagnosesPanel";
 import { FollowUpsPanel } from "@/components/dashboard/FollowUpsPanel";
+import { TimelinePanel } from "@/components/dashboard/TimelinePanel";
 import { PCRExport } from "@/components/dashboard/PCRExport";
 import { AppLogo } from "@/components/dashboard/AppLogo";
 import { AnalysisResult } from "@/lib/types";
@@ -33,9 +35,7 @@ export default function Home() {
         body: JSON.stringify({ text: transcript, language }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to analyze transcript");
-      }
+      if (!response.ok) throw new Error("Failed to analyze transcript");
 
       const data = await response.json();
       setAnalysisResult(data);
@@ -49,90 +49,91 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-synapse overflow-hidden">
-      {/* ── Header ── */}
-      <header className="shrink-0 h-14 px-6 flex items-center justify-between border-b border-white/[0.06] bg-white/[0.02] backdrop-blur-xl">
-        <div className="flex items-center gap-3">
-          <AppLogo />
-          <div className="flex items-baseline gap-2">
-            <h1 className="text-sm font-semibold text-white tracking-tight">Synapse</h1>
-            <span className="text-[10px] text-slate-500 font-medium">AI Second Responder</span>
+    <div className="min-h-screen bg-synapse relative">
+      <div className="relative z-10">
+        {/* ── Header ── */}
+        <header className="sticky top-0 z-40 h-16 px-6 flex items-center justify-between border-b border-white/[0.04] bg-[#030712]/80 backdrop-blur-2xl">
+          <div className="flex items-center gap-4">
+            <AppLogo />
+            <div>
+              <h1 className="text-lg font-bold text-gradient tracking-tight leading-none">Synapse</h1>
+              <p className="text-[10px] text-slate-500 font-medium tracking-wider uppercase">AI Second Responder</p>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[10px] text-slate-400 font-medium">System Online</span>
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full glass-inner">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[11px] text-slate-400 font-medium">System Online</span>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* ── Bento Grid ── */}
-      <main className="flex-1 min-h-0 p-3 grid grid-cols-12 grid-rows-[1fr_1fr_auto] gap-3">
-        {/* ── Zone A: Left Column (Audio + Scenarios + Transcript) ── */}
-        <section className="col-span-4 row-span-2 flex flex-col gap-3 min-h-0">
-          {/* Audio Controls */}
-          <div className="glass-card p-4 shrink-0">
-            <div className="section-label mb-3">Audio Input</div>
-            <div className="flex gap-2 mb-2">
-              <div className="flex-1">
+        {/* ── Main Content ── */}
+        <main className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6">
+          <div className="flex flex-col lg:flex-row gap-5">
+
+            {/* ── Left Column: Input ── */}
+            <div className="w-full lg:w-[380px] xl:w-[420px] shrink-0 space-y-4 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-1">
+              {/* Audio Input */}
+              <div className="glass p-5">
+                <p className="section-label mb-3">Audio Input</p>
                 <LiveMic onTranscript={handleTranscript} />
+                <div className="my-3 flex items-center gap-3">
+                  <div className="flex-1 h-px bg-white/5" />
+                  <span className="text-[10px] text-slate-600 font-medium">OR</span>
+                  <div className="flex-1 h-px bg-white/5" />
+                </div>
+                <FileUpload onTranscript={handleTranscript} />
               </div>
+
+              {/* Demo Scenarios */}
+              <div className="glass p-5">
+                <p className="section-label mb-3">Demo Scenarios</p>
+                <Scenarios onSelectScenario={handleTranscript} />
+              </div>
+
+              {/* Transcript */}
+              <TranscriptPanel
+                transcript={transcript}
+                onChange={setTranscript}
+                onAnalyze={() => handleAnalyze("English")}
+                isAnalyzing={isAnalyzing}
+              />
             </div>
-            <FileUpload onTranscript={handleTranscript} />
 
-            {/* Waveform visualization */}
-            <div className="mt-3 flex items-end justify-center gap-[3px] h-6">
-              {Array.from({ length: 24 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="w-[2px] bg-blue-400/30 rounded-full waveform-bar"
-                  style={{
-                    animationDelay: `${i * 0.05}s`,
-                    height: "20%",
-                  }}
-                />
-              ))}
+            {/* ── Right Column: Results ── */}
+            <div className="flex-1 min-w-0 space-y-5">
+              {/* Row 1: Severity + Vitals */}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                <div className="perspective-container">
+                  <SeverityGauge result={analysisResult} isAnalyzing={isAnalyzing} />
+                </div>
+                <div className="perspective-container">
+                  <VitalsPanel result={analysisResult} isAnalyzing={isAnalyzing} />
+                </div>
+              </div>
+
+              {/* Row 2: Diagnoses + Follow-ups */}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                <div className="perspective-container">
+                  <DiagnosesPanel result={analysisResult} isAnalyzing={isAnalyzing} />
+                </div>
+                <div className="perspective-container">
+                  <FollowUpsPanel result={analysisResult} isAnalyzing={isAnalyzing} />
+                </div>
+              </div>
+
+              {/* Row 3: Timeline */}
+              <div className="perspective-container">
+                <TimelinePanel result={analysisResult} isAnalyzing={isAnalyzing} />
+              </div>
+
+              {/* Row 4: PCR Export */}
+              <PCRExport result={analysisResult} />
             </div>
           </div>
-
-          {/* Scenarios */}
-          <div className="glass-card p-4 shrink-0">
-            <div className="section-label mb-2">Demo Scenarios</div>
-            <Scenarios onSelectScenario={handleTranscript} />
-          </div>
-
-          {/* Transcript */}
-          <div className="flex-1 min-h-0">
-            <TranscriptPanel
-              transcript={transcript}
-              onChange={setTranscript}
-              onAnalyze={() => handleAnalyze("English")}
-              isAnalyzing={isAnalyzing}
-            />
-          </div>
-        </section>
-
-        {/* ── Zone B: Vitals (Top Right) ── */}
-        <section className="col-span-4 row-span-1 min-h-0">
-          <VitalsPanel result={analysisResult} isAnalyzing={isAnalyzing} />
-        </section>
-
-        {/* ── Zone C: Diagnoses (Middle Right) ── */}
-        <section className="col-span-4 row-span-2 min-h-0">
-          <DiagnosesPanel result={analysisResult} isAnalyzing={isAnalyzing} />
-        </section>
-
-        {/* ── Zone D: Follow-ups (Bottom of middle) ── */}
-        <section className="col-span-4 row-span-1 min-h-0">
-          <FollowUpsPanel result={analysisResult} isAnalyzing={isAnalyzing} />
-        </section>
-
-        {/* ── Zone E: PCR Export (Bottom Span) ── */}
-        <section className="col-span-12 row-span-1 shrink-0">
-          <PCRExport result={analysisResult} />
-        </section>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

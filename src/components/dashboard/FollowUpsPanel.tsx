@@ -1,7 +1,7 @@
 "use client";
 
 import { AnalysisResult } from "@/lib/types";
-import { Bot, MessageCircleQuestion } from "lucide-react";
+import { Bot, MessageCircleQuestion, Sparkles } from "lucide-react";
 
 interface FollowUpsPanelProps {
   result: AnalysisResult | null;
@@ -10,54 +10,51 @@ interface FollowUpsPanelProps {
 
 export function FollowUpsPanel({ result, isAnalyzing }: FollowUpsPanelProps) {
   const followUps = result?.agentic_follow_ups || [];
-  const hasFollowUps = followUps.length > 0;
 
-  if (!hasFollowUps && !isAnalyzing) {
+  if (!followUps.length && !isAnalyzing) {
     return (
-      <div className="glass-card p-4 h-full flex flex-col">
-        <div className="section-label mb-3 flex items-center gap-2">
-          <Bot className="w-3 h-3" />
-          Agentic Follow-ups
-        </div>
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-xs text-slate-500">Awaiting analysis...</p>
-        </div>
+      <div className="glass p-5 h-full flex flex-col items-center justify-center min-h-[200px]">
+        <Bot className="w-10 h-10 text-slate-700 mb-3" />
+        <p className="text-sm text-slate-500 font-medium">Agentic Follow-ups</p>
+        <p className="text-xs text-slate-600 mt-1">AI-generated interview questions</p>
       </div>
     );
   }
 
-  if (isAnalyzing && !hasFollowUps) {
+  if (isAnalyzing && !followUps.length) {
     return (
-      <div className="glass-card p-4 h-full flex flex-col">
-        <div className="section-label mb-3 flex items-center gap-2">
-          <Bot className="w-3 h-3" />
-          Agentic Follow-ups
+      <div className="glass p-5 h-full flex flex-col items-center justify-center min-h-[200px]">
+        <div className="relative w-12 h-12 mb-3">
+          <div className="absolute inset-0 rounded-full border-2 border-violet-400/30" />
+          <div className="absolute inset-0 rounded-full border-2 border-violet-400 border-t-transparent animate-spin" />
+          <Bot className="absolute inset-0 m-auto w-5 h-5 text-violet-400" />
         </div>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-6 h-6 border-2 border-violet-400 border-t-transparent rounded-full animate-spin" />
-            <p className="text-xs text-violet-400">Generating questions...</p>
-          </div>
-        </div>
+        <p className="text-sm text-violet-400 font-medium">Generating questions...</p>
       </div>
     );
   }
 
   return (
-    <div className="glass-card p-4 h-full flex flex-col overflow-hidden">
-      <div className="section-label mb-3 flex items-center gap-2">
-        <Bot className="w-3 h-3" />
+    <div className="glass p-5 h-full">
+      <p className="section-label mb-2 flex items-center gap-2">
+        <Sparkles className="w-3 h-3" />
         Agentic Follow-ups
-      </div>
+      </p>
+      <p className="text-[10px] text-slate-500 mb-4">Critical questions to close diagnostic gaps</p>
 
-      <div className="flex-1 overflow-y-auto space-y-1.5 pr-1">
+      <div className="space-y-2.5">
         {followUps.map((q, idx) => (
           <div
             key={idx}
-            className="flex items-start gap-2.5 p-2 rounded-lg bg-violet-500/[0.06] border border-violet-500/10 hover:bg-violet-500/10 transition-colors"
+            className={`group flex items-start gap-3 p-3.5 rounded-xl bg-violet-500/[0.04] border border-violet-500/10 hover:bg-violet-500/[0.08] hover:border-violet-500/20 transition-all cursor-default fade-in stagger-${Math.min(idx + 1, 6)}`}
           >
-            <MessageCircleQuestion className="w-3.5 h-3.5 text-violet-400 mt-0.5 shrink-0" />
-            <p className="text-xs text-slate-200 leading-relaxed">{q}</p>
+            <div className="w-6 h-6 rounded-lg bg-violet-500/15 flex items-center justify-center shrink-0 mt-0.5">
+              <MessageCircleQuestion className="w-3.5 h-3.5 text-violet-400" />
+            </div>
+            <div>
+              <p className="text-[10px] text-violet-400/60 font-semibold uppercase tracking-wider mb-0.5">Question {idx + 1}</p>
+              <p className="text-sm text-slate-200 leading-relaxed">{q}</p>
+            </div>
           </div>
         ))}
       </div>

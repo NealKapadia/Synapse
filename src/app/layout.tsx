@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space",
   subsets: ["latin"],
 });
 
@@ -25,18 +25,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
+      <body className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} antialiased`}>
         {children}
         <Toaster
           position="bottom-right"
           toastOptions={{
             style: {
-              background: 'rgba(15, 23, 42, 0.9)',
+              background: 'rgba(15, 23, 42, 0.95)',
               color: '#e2e8f0',
-              border: '1px solid rgba(255,255,255,0.1)',
-              backdropFilter: 'blur(12px)',
-              borderRadius: '12px',
+              border: '1px solid rgba(255,255,255,0.08)',
+              backdropFilter: 'blur(16px)',
+              borderRadius: '16px',
               fontSize: '13px',
+              fontFamily: 'Space Grotesk, sans-serif',
             },
           }}
         />
