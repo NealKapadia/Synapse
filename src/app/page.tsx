@@ -44,6 +44,7 @@ export default function Home() {
     const text = transcriptRef.current;
     if (!text.trim() || isAnalyzingRef.current) return;
     setIsAnalyzing(true);
+    setAnalysisResult(null); // Clear previous results
 
     try {
       const response = await fetch("/api/analyze", {
