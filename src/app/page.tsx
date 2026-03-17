@@ -17,7 +17,7 @@ import { AppLogo } from "@/components/dashboard/AppLogo";
 import { AnalysisResult } from "@/lib/types";
 import toast from "react-hot-toast";
 
-const POLL_INTERVAL = 7_000;
+const POLL_INTERVAL = 5_000;
 
 const panelVariants = {
   hidden: { opacity: 0, y: 16 },
@@ -28,13 +28,17 @@ export default function Home() {
   const [transcript, setTranscript] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [lastAnalyzed, setLastAnalyzed] = useState<Date | null>(null);
   const transcriptRef = useRef(transcript);
   const isAnalyzingRef = useRef(false);
+  const isFetchingRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => { transcriptRef.current = transcript; }, [transcript]);
   useEffect(() => { isAnalyzingRef.current = isAnalyzing; }, [isAnalyzing]);
+  useEffect(() => { isFetchingRef.current = isFetching; }, [isFetching]);
 
   const handleTranscript = (text: string) => {
     setTranscript(text);
@@ -42,17 +46,32 @@ export default function Home() {
 
   const handleAnalyze = useCallback(async (isManual: boolean = false) => {
     const text = transcriptRef.current;
-    if (!text.trim() || isAnalyzingRef.current) return;
+    if (!text.trim()) return;
+
+    if (isFetchingRef.current) {
+      if (!isManual) return; // Never fire a new poll if the previous API request is still pending
+
+      // If manual, abort the pending request to start a fresh one
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    }
+
     setIsAnalyzing(true);
+    setIsFetching(true);
     if (isManual) {
       setAnalysisResult(null); // Clear previous results only on manual trigger
     }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, language: "English" }),
+        signal: controller.signal,
       });
 
       if (!response.ok) throw new Error("Failed to analyze transcript");
@@ -60,15 +79,23 @@ export default function Home() {
       const data = await response.json();
       setAnalysisResult(data);
       setLastAnalyzed(new Date());
-    } catch (error) {
+    } catch (error: any) {
+      if (error.name === "AbortError") {
+        console.log("Fetch aborted for a new manual request");
+        return;
+      }
       console.error(error);
       toast.error("Failed to analyze transcript. Check your API key and connection.");
     } finally {
-      setIsAnalyzing(false);
+      if (abortControllerRef.current === controller) {
+        setIsAnalyzing(false);
+        setIsFetching(false);
+        abortControllerRef.current = null;
+      }
     }
   }, []);
 
-  // 7-second polling when recording is active
+  // 5-second polling when recording is active
   useEffect(() => {
     if (!isRecording) return;
 
@@ -128,7 +155,7 @@ export default function Home() {
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-red-400" />
                   </span>
                   <span className="text-[11px] text-red-300 font-semibold">AI Active</span>
-                  <span className="text-[9px] text-red-400/60 font-mono">7s poll</span>
+                  <span className="text-[9px] text-red-400/60 font-mono">5s poll</span>
                 </motion.div>
               )}
             </AnimatePresence>
