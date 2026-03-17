@@ -17,7 +17,7 @@ import { AppLogo } from "@/components/dashboard/AppLogo";
 import { AnalysisResult } from "@/lib/types";
 import toast from "react-hot-toast";
 
-const POLL_INTERVAL = 10_000;
+const POLL_INTERVAL = 15_000;
 
 const panelVariants = {
   hidden: { opacity: 0, y: 16 },
@@ -40,11 +40,13 @@ export default function Home() {
     setTranscript(text);
   };
 
-  const handleAnalyze = useCallback(async () => {
+  const handleAnalyze = useCallback(async (isManual: boolean = false) => {
     const text = transcriptRef.current;
     if (!text.trim() || isAnalyzingRef.current) return;
     setIsAnalyzing(true);
-    setAnalysisResult(null); // Clear previous results
+    if (isManual) {
+      setAnalysisResult(null); // Clear previous results only on manual trigger
+    }
 
     try {
       const response = await fetch("/api/analyze", {
@@ -66,13 +68,13 @@ export default function Home() {
     }
   }, []);
 
-  // 10-second polling when recording is active
+  // 15-second polling when recording is active
   useEffect(() => {
     if (!isRecording) return;
 
     const intervalId = setInterval(() => {
       if (transcriptRef.current.trim()) {
-        handleAnalyze();
+        handleAnalyze(false);
       }
     }, POLL_INTERVAL);
 
@@ -88,7 +90,7 @@ export default function Home() {
     const handler = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
         e.preventDefault();
-        handleAnalyze();
+        handleAnalyze(true);
       }
     };
     window.addEventListener("keydown", handler);
@@ -165,7 +167,7 @@ export default function Home() {
               <TranscriptPanel
                 transcript={transcript}
                 onChange={setTranscript}
-                onAnalyze={handleAnalyze}
+                onAnalyze={() => handleAnalyze(true)}
                 isAnalyzing={isAnalyzing}
               />
             </div>

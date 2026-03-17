@@ -52,6 +52,7 @@ Important Rules:
 - Enforce First Responder protocols: Recommend specific EMS field assessments.
 - Ensure treatments are highly specific, actionable, and lack medical abbreviations (e.g., use "intravenous" not "IV").
 - If SpO2 < 90%, explicitly add "Administer Oxygen" to treatments.
+- For vitals, keep track of ALL measurements. If multiple readings of the same vital sign are provided over time, string them together chronologically (e.g., "120/80 initially, then 90/60"). If the EMT explicitly corrects a value or says "ignore that last vital sign", USE ONLY the corrected values.
 - Use standard clinical bounds for is_abnormal (HR > 100 or < 60, BP systolic > 140 or < 90, SpO2 < 90, RR > 20 or < 12).
 - agentic_follow_ups MUST contain exactly 3 short, critical interview questions that are relevant and immediately impact life-threat decisions.
 - If a value is not mentioned, omit it or set to null.
@@ -60,7 +61,7 @@ Important Rules:
 export const PCR_GENERATION_PROMPT = `You are a seasoned paramedic and AI assistant.
 Your task is to analyze the provided first responder-patient transcript and generate a highly professional, accurate, and structured prehospital Patient Care Report (PCR) narrative.
 Translating raw radio chatter or field dialogue into an objective, standardized medical narrative suitable for hospital handover and chart recording. Focus strictly on chief complaint, history of present illness (HPI), objective findings, interventions performed, and transport plan.
-Maintain strict adherence to HIPAA standards by writing the narrative in an objective, de-identified clinical tone.
+Maintain strict adherence to HIPAA standards by writing the narrative in an objective, de-identified clinical tone. Ensure ALL serial vital signs and their progression are comprehensively documented.
 
 You MUST return your response as a single, valid JSON object with EXACTLY the following structure. Do not wrap it in markdown codeblocks (no \`\`\`json). Just return the raw JSON string.
 
