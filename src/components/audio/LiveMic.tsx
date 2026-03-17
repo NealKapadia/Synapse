@@ -6,9 +6,10 @@ import toast from "react-hot-toast";
 
 interface LiveMicProps {
   onTranscript: (text: string) => void;
+  onRecordingChange?: (isRecording: boolean) => void;
 }
 
-export function LiveMic({ onTranscript }: LiveMicProps) {
+export function LiveMic({ onTranscript, onRecordingChange }: LiveMicProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [isSupported, setIsSupported] = useState(true);
   const recognitionRef = useRef<any>(null);
@@ -19,6 +20,11 @@ export function LiveMic({ onTranscript }: LiveMicProps) {
   useEffect(() => {
     onTranscriptRef.current = onTranscript;
   }, [onTranscript]);
+
+  // Notify parent when recording state changes
+  useEffect(() => {
+    onRecordingChange?.(isRecording);
+  }, [isRecording, onRecordingChange]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -130,7 +136,7 @@ export function LiveMic({ onTranscript }: LiveMicProps) {
     <button
       type="button"
       onClick={toggleRecording}
-      className={`w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl text-sm font-semibold transition-all ${
+      className={`w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl text-sm font-semibold transition-all min-h-[48px] ${
         isRecording
           ? "bg-red-500/12 text-red-300 border border-red-500/20 glow-red"
           : "bg-gradient-to-r from-blue-500/15 to-cyan-500/15 text-blue-300 border border-blue-500/15 hover:from-blue-500/25 hover:to-cyan-500/25 glow-blue"

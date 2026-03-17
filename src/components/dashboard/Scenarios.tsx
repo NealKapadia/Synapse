@@ -13,7 +13,7 @@ export function Scenarios({ onSelectScenario }: ScenariosProps) {
         <button
           key={scenario.id}
           onClick={() => onSelectScenario(scenario.mockTranscript)}
-          className="text-left w-full px-4 py-3 rounded-xl border border-white/[0.05] bg-white/[0.02] hover:bg-white/[0.05] hover:border-blue-500/20 transition-all group"
+          className="text-left w-full px-4 py-3 rounded-xl border border-white/[0.05] bg-white/[0.02] hover:bg-white/[0.05] hover:border-blue-500/20 transition-all group min-h-[48px]"
         >
           <div className="flex items-center gap-2.5">
             <span className="text-base">{scenario.emoji}</span>

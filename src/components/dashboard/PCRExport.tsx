@@ -42,7 +42,7 @@ export function PCRExport({ result }: PCRExportProps) {
       <button
         onClick={() => result?.patientCareReport && setIsOpen(true)}
         disabled={!result?.patientCareReport}
-        className={`w-full glass flex items-center justify-center gap-3 px-6 py-4 text-sm font-semibold transition-all ${
+        className={`w-full glass flex items-center justify-center gap-3 px-6 py-4 text-sm font-semibold transition-all min-h-[48px] ${
           result?.patientCareReport
             ? "glow-teal text-teal-300 hover:bg-white/[0.04] cursor-pointer"
             : "text-slate-600 cursor-not-allowed"

@@ -70,6 +70,7 @@ body {
 .glow-blue { box-shadow: 0 0 25px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(59, 130, 246, 0.1); }
 .glow-red { box-shadow: 0 0 25px rgba(239, 68, 68, 0.15), inset 0 1px 0 rgba(239, 68, 68, 0.1); }
 .glow-teal { box-shadow: 0 0 25px rgba(20, 184, 166, 0.12), inset 0 1px 0 rgba(20, 184, 166, 0.08); }
+.glow-radio { box-shadow: 0 0 30px rgba(251, 146, 60, 0.12), 0 0 60px rgba(251, 146, 60, 0.04); }
 
 /* ── Labels ── */
 .section-label {

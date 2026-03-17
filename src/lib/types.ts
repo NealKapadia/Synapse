@@ -23,6 +23,7 @@ export interface AnalysisResult {
     treatments: string[];
     agentic_follow_ups?: string[];
     clinical_timeline: string[];
+    radio_handoff_script: string;
     patientCareReport: string;
 }
 

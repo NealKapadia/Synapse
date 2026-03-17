@@ -17,6 +17,11 @@ export function TranscriptPanel({ transcript, onChange, onAnalyze, isAnalyzing }
         <span className="section-label flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
           Live Clinical Transcript
+          {transcript.trim() && (
+            <span className="text-[9px] text-slate-600 font-mono ml-1">
+              {transcript.trim().split(/\s+/).length}w
+            </span>
+          )}
         </span>
         <button
           onClick={() => onChange("")}
@@ -37,25 +42,32 @@ export function TranscriptPanel({ transcript, onChange, onAnalyze, isAnalyzing }
         />
 
         {/* Analyze button */}
-        <div className="absolute bottom-4 left-4 right-4 flex justify-end">
-          <button
-            onClick={onAnalyze}
-            disabled={!transcript.trim() || isAnalyzing}
-            className={`flex items-center gap-2.5 px-6 py-3 rounded-2xl text-sm font-semibold transition-all ${
-              !transcript.trim()
-                ? "bg-white/[0.03] text-slate-700 cursor-not-allowed"
-                : isAnalyzing
-                  ? "bg-blue-500/15 text-blue-300 cursor-wait glow-blue"
-                  : "bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-300 hover:from-blue-500/30 hover:to-cyan-500/30 glow-blue"
-            }`}
-          >
-            {isAnalyzing ? (
-              <div className="w-4 h-4 border-2 border-blue-300 rounded-full border-t-transparent animate-spin" />
-            ) : (
-              <Sparkles className="w-4 h-4" />
-            )}
-            {isAnalyzing ? "Analyzing..." : "Extract Insights"}
-          </button>
+        <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+          {transcript.trim() && !isAnalyzing && (
+            <span className="text-[10px] text-slate-600 font-mono hidden sm:block">
+              Ctrl+Enter
+            </span>
+          )}
+          <div className="ml-auto">
+            <button
+              onClick={onAnalyze}
+              disabled={!transcript.trim() || isAnalyzing}
+              className={`flex items-center gap-2.5 px-6 py-3 rounded-2xl text-sm font-semibold transition-all min-h-[48px] ${
+                !transcript.trim()
+                  ? "bg-white/[0.03] text-slate-700 cursor-not-allowed"
+                  : isAnalyzing
+                    ? "bg-blue-500/15 text-blue-300 cursor-wait glow-blue"
+                    : "bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-300 hover:from-blue-500/30 hover:to-cyan-500/30 glow-blue"
+              }`}
+            >
+              {isAnalyzing ? (
+                <div className="w-4 h-4 border-2 border-blue-300 rounded-full border-t-transparent animate-spin" />
+              ) : (
+                <Sparkles className="w-4 h-4" />
+              )}
+              {isAnalyzing ? "Analyzing..." : "Extract Insights"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -54,8 +54,8 @@ export function SeverityGauge({ result, isAnalyzing }: SeverityGaugeProps) {
   const IconComponent = config.icon;
 
   return (
-    <div className={`glass p-5 h-full ${config.glow}`}>
-      <div className="flex gap-5 h-full">
+    <div className={`glass p-5 h-full overflow-hidden flex flex-col ${config.glow}`}>
+      <div className="flex gap-5">
         {/* Gauge */}
         <div className="flex flex-col items-center justify-center shrink-0">
           <div className="relative">
@@ -79,41 +79,48 @@ export function SeverityGauge({ result, isAnalyzing }: SeverityGaugeProps) {
         </div>
 
         {/* Info */}
-        <div className="flex-1 flex flex-col justify-center min-w-0 gap-3">
+        <div className="flex-1 flex flex-col justify-center min-w-0 gap-2">
           {patientInfo && (
             <div>
-              <p className="section-label mb-1">Patient</p>
+              <p className="section-label mb-0.5">Patient</p>
               <p className="text-sm text-white font-semibold">{patientInfo.age} {patientInfo.sex}</p>
-              <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{patientInfo.chief_complaint}</p>
+              <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">{patientInfo.chief_complaint}</p>
             </div>
           )}
           {mechanism && mechanism !== "N/A" && (
             <div>
-              <p className="section-label mb-1">Mechanism</p>
-              <p className="text-xs text-slate-300 leading-relaxed line-clamp-2">{mechanism}</p>
+              <p className="section-label mb-0.5">Mechanism</p>
+              <p className="text-xs text-slate-300 leading-relaxed line-clamp-1">{mechanism}</p>
             </div>
           )}
           {scene && (
             <div>
-              <p className="section-label mb-1">Scene</p>
-              <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">{scene}</p>
+              <p className="section-label mb-0.5">Scene</p>
+              <p className="text-xs text-slate-400 leading-relaxed line-clamp-1">{scene}</p>
             </div>
           )}
         </div>
       </div>
 
+      {/* Severity Rationale */}
+      {severity.rationale && (
+        <div className="mt-3 px-3 py-2 rounded-xl" style={{ background: config.bg }}>
+          <p className="text-[11px] leading-relaxed line-clamp-2" style={{ color: config.color }}>{severity.rationale}</p>
+        </div>
+      )}
+
       {/* Red Flags */}
       {redFlags.length > 0 && (
-        <div className="mt-4 pt-3 border-t border-white/5">
+        <div className="mt-3 pt-3 border-t border-white/5 flex-1 min-h-0 overflow-y-auto">
           <p className="section-label mb-2 flex items-center gap-1.5">
             <IconComponent className="w-3 h-3" style={{ color: config.color }} />
             Red Flags
           </p>
-          <div className="flex flex-col gap-1.5">
-            {redFlags.map((flag, i) => (
-              <div key={i} className="flex items-start gap-2 px-3 py-1.5 rounded-lg" style={{ background: config.bg }}>
-                <span className="w-1 h-1 rounded-full mt-1.5 shrink-0" style={{ background: config.color }} />
-                <p className="text-xs leading-relaxed" style={{ color: config.color }}>{flag}</p>
+          <div className="flex flex-wrap gap-1.5">
+            {redFlags.slice(0, 5).map((flag, i) => (
+              <div key={i} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg" style={{ background: config.bg }}>
+                <span className="w-1 h-1 rounded-full shrink-0" style={{ background: config.color }} />
+                <p className="text-[11px] leading-tight" style={{ color: config.color }}>{flag}</p>
               </div>
             ))}
           </div>

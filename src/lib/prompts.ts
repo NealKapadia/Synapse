@@ -36,7 +36,8 @@ You MUST return your response as a single, valid JSON object with EXACTLY the fo
   ],
   "treatments": ["string", "string"],
   "agentic_follow_ups": ["string - exact question to ask", "string"],
-  "clinical_timeline": ["string - event in chronological order", "string"]
+  "clinical_timeline": ["string - event in chronological order", "string"],
+  "radio_handoff_script": "string - A concise MIST-format radio report for ER handoff. Format: M (Mechanism): ..., I (Injuries/Illness): ..., S (Signs/Symptoms & Vitals): ..., T (Treatment given & ETA): ..."
 }
 
 Important Rules:
@@ -45,8 +46,9 @@ Important Rules:
 - patient_info should extract age, sex, and chief complaint from the transcript. Use "Unknown" if not mentioned.
 - mechanism_of_injury should describe HOW the injury occurred (e.g., "High-speed MVC, unrestrained driver ejected from vehicle").
 - scene_assessment should describe initial scene findings (e.g., "Patient found outside vehicle, conscious but confused").
-- red_flags should list 2-5 critical clinical findings that demand immediate attention (e.g., "Hypotension with tachycardia suggesting hemorrhagic shock").
+- red_flags should list 2-5 critical clinical findings that demand immediate attention.
 - clinical_timeline should list 4-8 events in chronological order from the transcript.
+- radio_handoff_script MUST be a concise, professional MIST-format radio handoff. This will be read aloud by the EMT over the radio to the ER. Keep it under 4 sentences total, covering Mechanism, Injuries, Signs/vitals, and Treatment/ETA.
 - Enforce First Responder protocols: Recommend specific EMS field assessments.
 - If SpO2 < 92%, explicitly add "Administer Oxygen" to treatments.
 - Use standard clinical bounds for is_abnormal (HR > 100 or < 60, BP systolic > 140 or < 90, SpO2 < 95, RR > 20 or < 12).
