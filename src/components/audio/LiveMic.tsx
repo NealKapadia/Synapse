@@ -151,11 +151,10 @@ export function LiveMic({ onTranscript, onRecordingChange }: LiveMicProps) {
     <button
       type="button"
       onClick={toggleRecording}
-      className={`w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl text-sm font-semibold transition-all min-h-[48px] ${
-        isRecording
-          ? "bg-red-500/12 text-red-300 border border-red-500/20 glow-red"
-          : "bg-gradient-to-r from-blue-500/15 to-cyan-500/15 text-blue-300 border border-blue-500/15 hover:from-blue-500/25 hover:to-cyan-500/25 glow-blue"
-      }`}
+      className={`w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl text-sm font-semibold transition-all min-h-[48px] ${isRecording
+        ? "bg-red-500/12 text-red-300 border border-red-500/20 glow-red"
+        : "bg-gradient-to-r from-blue-500/15 to-cyan-500/15 text-blue-300 border border-blue-500/15 hover:from-blue-500/25 hover:to-cyan-500/25 glow-blue"
+        }`}
     >
       {isRecording ? (
         <>

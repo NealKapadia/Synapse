@@ -62,7 +62,7 @@ Important Rules:
 export const PCR_GENERATION_PROMPT = `You are a seasoned paramedic and AI assistant.
 Your task is to analyze the provided first responder-patient transcript and generate a highly professional, accurate, and structured prehospital Patient Care Report (PCR) narrative.
 Translating raw radio chatter or field dialogue into an objective, standardized medical narrative suitable for hospital handover and chart recording. Focus strictly on chief complaint, history of present illness (HPI), objective findings, interventions performed, and transport plan.
-Maintain strict adherence to HIPAA standards by writing the narrative in an objective, de-identified clinical tone.
+Maintain strict adherence to HIPAA standards by writing the narrative in an objective, de-identified clinical tone. Ensure ALL serial vital signs and their progression are comprehensively documented.
 
 You MUST return your response as a single, valid JSON object with EXACTLY the following structure. Do not wrap it in markdown codeblocks (no \`\`\`json). Just return the raw JSON string.
 

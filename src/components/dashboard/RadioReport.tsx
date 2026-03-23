@@ -36,7 +36,7 @@ export function RadioReport({ result, isAnalyzing }: RadioReportProps) {
     return (
       <div className="glass p-5 flex flex-col items-center justify-center min-h-[100px]">
         <Radio className="w-6 h-6 text-slate-600 mb-2" />
-        <p className="text-xs text-slate-500">MIST Radio Report will appear after analysis</p>
+        <p className="text-xs text-slate-500">Radio Report will appear after analysis</p>
       </div>
     );
   }
@@ -58,9 +58,8 @@ export function RadioReport({ result, isAnalyzing }: RadioReportProps) {
     <div className="glass p-5 overflow-hidden glow-radio">
       <div className="flex items-center justify-between mb-3">
         <p className="section-label flex items-center gap-2">
-          <Radio className="w-3.5 h-3.5 text-orange-400" />
+          <Radio className="w-4 h-4 text-orange-400" />
           <span>ER Radio Handoff</span>
-          <span className="text-[9px] px-2 py-0.5 rounded-full bg-orange-500/12 text-orange-400 border border-orange-500/15 font-semibold uppercase tracking-wider">MIST</span>
         </p>
         <div className="flex items-center gap-1.5">
           <button
