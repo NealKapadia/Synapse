@@ -90,13 +90,13 @@ export function SeverityGauge({ result, isAnalyzing }: SeverityGaugeProps) {
           {mechanism && mechanism !== "N/A" && (
             <div>
               <p className="section-label mb-0.5">Mechanism</p>
-              <p className="text-xs text-slate-300 leading-relaxed line-clamp-2">{mechanism}</p>
+              <p className="text-xs text-slate-300 leading-relaxed">{mechanism}</p>
             </div>
           )}
           {scene && (
             <div>
               <p className="section-label mb-0.5">Scene</p>
-              <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">{scene}</p>
+              <p className="text-xs text-slate-400 leading-relaxed">{scene}</p>
             </div>
           )}
         </div>

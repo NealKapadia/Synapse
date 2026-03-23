@@ -57,7 +57,7 @@ export function VitalsPanel({ result, isAnalyzing }: VitalsPanelProps) {
     );
   }
 
-  const vitalEntries = Object.entries(vitals || {});
+  const vitalEntries = Object.entries(vitals || {}).filter(([_, v]) => v != null && typeof v === 'object');
 
   return (
     <div className="glass p-5 h-full">
@@ -72,11 +72,10 @@ export function VitalsPanel({ result, isAnalyzing }: VitalsPanelProps) {
           return (
             <TiltCard
               key={key}
-              className={`relative rounded-2xl p-4 flex flex-col items-center justify-center text-center transition-all border fade-in stagger-${Math.min(i + 1, 6)} ${
-                isAbnormal
+              className={`relative rounded-2xl p-4 flex flex-col items-center justify-center text-center transition-all border fade-in stagger-${Math.min(i + 1, 6)} ${isAbnormal
                   ? "bg-red-500/8 border-red-500/20 glow-red"
                   : "bg-white/[0.02] border-white/[0.05]"
-              }`}
+                }`}
             >
               <IconComp className={`w-4 h-4 mb-2 ${isAbnormal ? "text-red-400" : "text-slate-500"}`} />
               <span className="text-[10px] uppercase tracking-wider text-slate-400 mb-1 font-medium">

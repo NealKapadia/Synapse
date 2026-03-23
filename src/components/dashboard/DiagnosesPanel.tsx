@@ -46,8 +46,8 @@ export function DiagnosesPanel({ result, isAnalyzing }: DiagnosesPanelProps) {
     <div className="glass p-5 h-full flex flex-col gap-4">
       {/* Diagnoses */}
       <div>
-        <p className="section-label mb-3 flex items-center gap-2">
-          <Stethoscope className="w-3 h-3" />
+        <p className="section-label mb-3 flex items-center gap-2 text-base">
+          <Stethoscope className="w-4 h-4 text-teal-400" />
           Diagnoses & ICD-10
         </p>
 
@@ -57,14 +57,14 @@ export function DiagnosesPanel({ result, isAnalyzing }: DiagnosesPanelProps) {
             return (
               <TiltCard
                 key={i}
-                className={`glass-inner p-4 space-y-3 fade-in stagger-${Math.min(i + 1, 6)}`}
+                className={`glass-inner p-4 space-y-3 fade-in stagger-${Math.min(i + 1, 6)} shadow-lg border border-white/10 hover:border-white/20 transition-all`}
               >
                 {/* Header row */}
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo-500/12 text-indigo-300 border border-indigo-500/15 shrink-0">
-                        {d.icd_10_code}
+                    <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                      <span className="text-xs font-mono px-2.5 py-1 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/20 font-medium">
+                        ICD-10: {d.icd_10_code}
                       </span>
                       {i === 0 && (
                         <span className="text-[9px] px-2 py-0.5 rounded-full bg-teal-500/12 text-teal-400 border border-teal-500/15 font-semibold uppercase tracking-wider">
@@ -72,13 +72,13 @@ export function DiagnosesPanel({ result, isAnalyzing }: DiagnosesPanelProps) {
                         </span>
                       )}
                     </div>
-                    <p className="text-base font-bold text-white leading-tight">{d.condition_name}</p>
+                    <p className="text-lg font-bold text-white leading-tight tracking-wide">{d.condition_name}</p>
                   </div>
 
                   {/* Confidence badge */}
                   {d.confidence_score !== undefined && (
                     <div className={`flex flex-col items-center justify-center px-3 py-2 rounded-xl border shrink-0 ${colors.bg} ${colors.glow}`}>
-                      <span className={`text-xl font-bold tabular-nums leading-none ${colors.text}`}>
+                      <span className={`text-xl font-black tabular-nums leading-none ${colors.text}`}>
                         {d.confidence_score}%
                       </span>
                       <span className={`text-[9px] font-semibold uppercase tracking-wider mt-0.5 ${colors.text} opacity-70`}>
@@ -90,7 +90,7 @@ export function DiagnosesPanel({ result, isAnalyzing }: DiagnosesPanelProps) {
 
                 {/* Confidence bar */}
                 {d.confidence_score !== undefined && (
-                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-1000 ease-out ${colors.bar}`}
                       style={{ width: `${d.confidence_score}%` }}
@@ -100,16 +100,14 @@ export function DiagnosesPanel({ result, isAnalyzing }: DiagnosesPanelProps) {
 
                 {/* Differential diagnoses */}
                 {d.differential_diagnoses && d.differential_diagnoses.length > 0 && (
-                  <div>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider font-medium mb-1.5">Differentials to Rule Out</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {d.differential_diagnoses.map((diff, idx) => (
-                        <span key={idx} className="flex items-center gap-1 text-[11px] px-2 py-1 rounded-lg bg-white/[0.03] text-slate-400 border border-white/[0.05]">
-                          <ChevronRight className="w-2.5 h-2.5 text-slate-600" />
-                          {diff}
-                        </span>
-                      ))}
-                    </div>
+                  <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/[0.06]">
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold mr-1 self-center">Differentials:</span>
+                    {d.differential_diagnoses.map((diff, idx) => (
+                      <span key={idx} className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md bg-white/[0.04] text-slate-300 border border-white/[0.06]">
+                        <ChevronRight className="w-2.5 h-2.5 text-slate-600" />
+                        {diff}
+                      </span>
+                    ))}
                   </div>
                 )}
               </TiltCard>
@@ -121,8 +119,8 @@ export function DiagnosesPanel({ result, isAnalyzing }: DiagnosesPanelProps) {
       {/* Treatments */}
       {treatments.length > 0 && (
         <div className="pt-3 border-t border-white/[0.05]">
-          <p className="section-label mb-3 flex items-center gap-2">
-            <Pill className="w-3 h-3" />
+          <p className="section-label mb-3 flex items-center gap-2 text-base">
+            <Pill className="w-4 h-4 text-emerald-400" />
             Recommended Treatments
           </p>
           <div className="space-y-2">
