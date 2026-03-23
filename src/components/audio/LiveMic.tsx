@@ -67,12 +67,27 @@ export function LiveMic({ onTranscript, onRecordingChange }: LiveMicProps) {
       if (event.error === "not-allowed") {
         toast.error("Microphone access denied. Please allow microphone access in your browser settings.");
         shouldRestartRef.current = false;
+        setIsRecording(false);
+      } else if (event.error === "network") {
+        // Network error from Google's speech API — stop auto-restart, let user retry manually
+        shouldRestartRef.current = false;
+        setIsRecording(false);
+        toast.error("Speech recognition network error. This feature requires internet access to Google's servers. Please check your connection and try again.", { duration: 5000 });
       } else if (event.error === "no-speech") {
-        // Silence detected - auto-restart if still recording
+        // Silence detected - auto-restart continues if still recording
       } else if (event.error === "aborted") {
-        // Intentional stop
+        // Intentional stop - do nothing
+      } else if (event.error === "service-not-allowed") {
+        shouldRestartRef.current = false;
+        setIsRecording(false);
+        toast.error("Speech recognition service not allowed. Try using Chrome or Edge on HTTPS.");
       } else {
-        toast.error(`Microphone error: ${event.error}`);
+        // For other errors, attempt restart once more before giving up
+        if (shouldRestartRef.current) {
+          // Let onend handler attempt restart
+        } else {
+          toast.error(`Microphone error: ${event.error}`);
+        }
       }
     };
 

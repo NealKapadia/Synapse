@@ -84,19 +84,19 @@ export function SeverityGauge({ result, isAnalyzing }: SeverityGaugeProps) {
             <div>
               <p className="section-label mb-0.5">Patient</p>
               <p className="text-sm text-white font-semibold">{patientInfo.age} {patientInfo.sex}</p>
-              <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">{patientInfo.chief_complaint}</p>
+              <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{patientInfo.chief_complaint}</p>
             </div>
           )}
           {mechanism && mechanism !== "N/A" && (
             <div>
               <p className="section-label mb-0.5">Mechanism</p>
-              <p className="text-xs text-slate-300 leading-relaxed line-clamp-1">{mechanism}</p>
+              <p className="text-xs text-slate-300 leading-relaxed line-clamp-2">{mechanism}</p>
             </div>
           )}
           {scene && (
             <div>
               <p className="section-label mb-0.5">Scene</p>
-              <p className="text-xs text-slate-400 leading-relaxed line-clamp-1">{scene}</p>
+              <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">{scene}</p>
             </div>
           )}
         </div>
@@ -105,7 +105,7 @@ export function SeverityGauge({ result, isAnalyzing }: SeverityGaugeProps) {
       {/* Severity Rationale */}
       {severity.rationale && (
         <div className="mt-3 px-3 py-2 rounded-xl" style={{ background: config.bg }}>
-          <p className="text-[11px] leading-relaxed line-clamp-2" style={{ color: config.color }}>{severity.rationale}</p>
+          <p className="text-[11px] leading-relaxed" style={{ color: config.color }}>{severity.rationale}</p>
         </div>
       )}
 
