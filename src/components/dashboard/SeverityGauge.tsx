@@ -22,7 +22,7 @@ export function SeverityGauge({ result, isAnalyzing }: SeverityGaugeProps) {
   const scene = result?.scene_assessment;
   const redFlags = result?.red_flags || [];
 
-  if (!severity && !isAnalyzing) {
+  if (!severity && (!isAnalyzing || result)) {
     return (
       <div className="glass p-6 h-full flex flex-col items-center justify-center">
         <div className="w-24 h-24 rounded-full border-2 border-dashed border-white/10 flex items-center justify-center mb-4">
@@ -34,7 +34,7 @@ export function SeverityGauge({ result, isAnalyzing }: SeverityGaugeProps) {
     );
   }
 
-  if (isAnalyzing && !severity) {
+  if (isAnalyzing && !result) {
     return (
       <div className="glass p-6 h-full flex flex-col items-center justify-center">
         <div className="w-24 h-24 rounded-full border-2 border-blue-500/30 flex items-center justify-center mb-4 relative">

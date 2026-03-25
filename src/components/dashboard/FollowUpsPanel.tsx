@@ -11,7 +11,7 @@ interface FollowUpsPanelProps {
 export function FollowUpsPanel({ result, isAnalyzing }: FollowUpsPanelProps) {
   const followUps = result?.agentic_follow_ups || [];
 
-  if (!followUps.length && !isAnalyzing) {
+  if (!followUps.length && (!isAnalyzing || result)) {
     return (
       <div className="glass p-5 h-full flex flex-col items-center justify-center min-h-[200px]">
         <Bot className="w-10 h-10 text-slate-700 mb-3" />
@@ -21,7 +21,7 @@ export function FollowUpsPanel({ result, isAnalyzing }: FollowUpsPanelProps) {
     );
   }
 
-  if (isAnalyzing && !followUps.length) {
+  if (isAnalyzing && !result) {
     return (
       <div className="glass p-5 h-full flex flex-col items-center justify-center min-h-[200px]">
         <div className="relative w-12 h-12 mb-3">

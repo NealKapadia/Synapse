@@ -34,7 +34,7 @@ export function VitalsPanel({ result, isAnalyzing }: VitalsPanelProps) {
   const vitals = result?.vitals;
   const hasVitals = vitals && Object.keys(vitals).length > 0;
 
-  if (!hasVitals && !isAnalyzing) {
+  if (!hasVitals && (!isAnalyzing || result)) {
     return (
       <div className="glass p-5 h-full flex flex-col items-center justify-center min-h-[200px]">
         <Activity className="w-10 h-10 text-slate-700 mb-3" />
@@ -44,7 +44,7 @@ export function VitalsPanel({ result, isAnalyzing }: VitalsPanelProps) {
     );
   }
 
-  if (isAnalyzing && !hasVitals) {
+  if (isAnalyzing && !result) {
     return (
       <div className="glass p-5 h-full flex flex-col items-center justify-center min-h-[200px]">
         <div className="relative w-12 h-12 mb-3">

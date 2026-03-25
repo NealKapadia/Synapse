@@ -12,7 +12,7 @@ export function TimelinePanel({ result, isAnalyzing }: TimelinePanelProps) {
   const timeline = result?.clinical_timeline || [];
   const symptoms = result?.symptoms || [];
 
-  if (!timeline.length && !symptoms.length && !isAnalyzing) {
+  if (!timeline.length && !symptoms.length && (!isAnalyzing || result)) {
     return (
       <div className="glass p-5 flex items-center justify-center min-h-[100px]">
         <div className="text-center">
@@ -23,7 +23,7 @@ export function TimelinePanel({ result, isAnalyzing }: TimelinePanelProps) {
     );
   }
 
-  if (isAnalyzing && !timeline.length) {
+  if (isAnalyzing && !result) {
     return (
       <div className="glass p-5 flex items-center justify-center min-h-[100px]">
         <div className="flex items-center gap-3">

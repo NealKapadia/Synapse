@@ -19,7 +19,7 @@ export function DiagnosesPanel({ result, isAnalyzing }: DiagnosesPanelProps) {
   const diagnoses = result?.diagnoses || [];
   const treatments = result?.treatments || [];
 
-  if (!diagnoses.length && !isAnalyzing) {
+  if (!diagnoses.length && (!isAnalyzing || result)) {
     return (
       <div className="glass p-5 h-full flex flex-col items-center justify-center min-h-[200px]">
         <Stethoscope className="w-10 h-10 text-slate-700 mb-3" />
@@ -29,7 +29,7 @@ export function DiagnosesPanel({ result, isAnalyzing }: DiagnosesPanelProps) {
     );
   }
 
-  if (isAnalyzing && !diagnoses.length) {
+  if (isAnalyzing && !result) {
     return (
       <div className="glass p-5 h-full flex flex-col items-center justify-center min-h-[200px]">
         <div className="relative w-12 h-12 mb-3">

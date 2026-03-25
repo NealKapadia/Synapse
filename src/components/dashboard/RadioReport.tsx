@@ -32,7 +32,7 @@ export function RadioReport({ result, isAnalyzing }: RadioReportProps) {
     toast.success("Reading radio script aloud...");
   };
 
-  if (!script && !isAnalyzing) {
+  if (!script && (!isAnalyzing || result)) {
     return (
       <div className="glass p-5 flex flex-col items-center justify-center min-h-[100px]">
         <Radio className="w-6 h-6 text-slate-600 mb-2" />
@@ -41,7 +41,7 @@ export function RadioReport({ result, isAnalyzing }: RadioReportProps) {
     );
   }
 
-  if (isAnalyzing && !script) {
+  if (isAnalyzing && !result) {
     return (
       <div className="glass p-5 flex items-center justify-center min-h-[100px]">
         <div className="flex items-center gap-3">
