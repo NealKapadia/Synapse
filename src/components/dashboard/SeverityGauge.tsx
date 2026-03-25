@@ -84,7 +84,7 @@ export function SeverityGauge({ result, isAnalyzing }: SeverityGaugeProps) {
             <div>
               <p className="section-label mb-0.5">Patient</p>
               <p className="text-sm text-white font-semibold">{patientInfo.age} {patientInfo.sex}</p>
-              <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">{patientInfo.chief_complaint}</p>
+              <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{patientInfo.chief_complaint}</p>
             </div>
           )}
           {mechanism && mechanism !== "N/A" && (

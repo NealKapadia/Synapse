@@ -1,7 +1,7 @@
 "use client";
 
 import { AnalysisResult } from "@/lib/types";
-import { Stethoscope, Pill } from "lucide-react";
+import { Stethoscope, Pill, ChevronRight, Activity } from "lucide-react";
 import { TiltCard } from "./TiltCard";
 
 interface DiagnosesPanelProps {
@@ -10,9 +10,9 @@ interface DiagnosesPanelProps {
 }
 
 function confidenceColor(score: number) {
-  if (score > 85) return { bar: "bg-emerald-500", text: "text-emerald-400", glow: "shadow-[0_0_12px_rgba(34,197,94,0.3)]" };
-  if (score > 60) return { bar: "bg-amber-500", text: "text-amber-400", glow: "shadow-[0_0_12px_rgba(245,158,11,0.3)]" };
-  return { bar: "bg-red-500", text: "text-red-400", glow: "shadow-[0_0_12px_rgba(239,68,68,0.3)]" };
+  if (score > 75) return { bar: "bg-emerald-500", text: "text-emerald-400", bg: "bg-emerald-500/8 border-emerald-500/15", glow: "shadow-[0_0_12px_rgba(34,197,94,0.25)]", label: "High" };
+  if (score > 50) return { bar: "bg-amber-500", text: "text-amber-400", bg: "bg-amber-500/8 border-amber-500/15", glow: "shadow-[0_0_12px_rgba(245,158,11,0.25)]", label: "Moderate" };
+  return { bar: "bg-red-500", text: "text-red-400", bg: "bg-red-500/8 border-red-500/15", glow: "shadow-[0_0_12px_rgba(239,68,68,0.25)]", label: "Low" };
 }
 
 export function DiagnosesPanel({ result, isAnalyzing }: DiagnosesPanelProps) {
@@ -43,71 +43,96 @@ export function DiagnosesPanel({ result, isAnalyzing }: DiagnosesPanelProps) {
   }
 
   return (
-    <div className="glass p-5 h-full">
-      <p className="section-label mb-4 flex items-center gap-2 text-base">
-        <Stethoscope className="w-4 h-4 text-teal-400" />
-        Diagnoses & ICD-10
-      </p>
+    <div className="glass p-5 h-full flex flex-col gap-4">
+      {/* Diagnoses */}
+      <div>
+        <p className="section-label mb-3 flex items-center gap-2 text-base">
+          <Stethoscope className="w-4 h-4 text-teal-400" />
+          Diagnoses & ICD-10
+        </p>
 
-      <div className="space-y-3">
-        {diagnoses.map((d, i) => {
-          const colors = confidenceColor(d.confidence_score);
-          return (
-            <TiltCard
-              key={i}
-              className={`glass-inner p-4 space-y-3 fade-in stagger-${Math.min(i + 1, 6)} shadow-lg border border-white/10 hover:border-white/20 transition-all`}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-col gap-2">
-                    <p className="text-lg md:text-xl font-bold text-white tracking-wide">{d.condition_name}</p>
-                    <span className="text-xs font-mono px-2.5 py-1 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/20 w-fit font-medium">
-                      ICD-10: {d.icd_10_code}
-                    </span>
-                  </div>
-                </div>
-                {d.confidence_score !== undefined && (
-                  <div className="flex flex-col items-end gap-1 shrink-0">
-                    <span className={`text-xl font-black tabular-nums ${colors.text} ${colors.glow} drop-shadow-md`}>
-                      {d.confidence_score}%
-                    </span>
-                    <div className={`w-20 h-2 bg-white/5 rounded-full overflow-hidden`}>
-                      <div
-                        className={`h-full rounded-full transition-all duration-1000 ease-out ${colors.bar}`}
-                        style={{ width: `${d.confidence_score}%` }}
-                      />
+        <div className="space-y-3">
+          {diagnoses.map((d, i) => {
+            const colors = confidenceColor(d.confidence_score);
+            return (
+              <TiltCard
+                key={i}
+                className={`glass-inner p-4 space-y-3 fade-in stagger-${Math.min(i + 1, 6)} shadow-lg border border-white/10 hover:border-white/20 transition-all`}
+              >
+                {/* Header row */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                      <span className="text-xs font-mono px-2.5 py-1 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/20 font-medium">
+                        ICD-10: {d.icd_10_code}
+                      </span>
+                      {i === 0 && (
+                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-teal-500/12 text-teal-400 border border-teal-500/15 font-semibold uppercase tracking-wider">
+                          Primary
+                        </span>
+                      )}
                     </div>
+                    <p className="text-lg font-bold text-white leading-tight tracking-wide">{d.condition_name}</p>
+                  </div>
+
+                  {/* Confidence badge */}
+                  {d.confidence_score !== undefined && (
+                    <div className={`flex flex-col items-center justify-center px-3 py-2 rounded-xl border shrink-0 ${colors.bg} ${colors.glow}`}>
+                      <span className={`text-xl font-black tabular-nums leading-none ${colors.text}`}>
+                        {d.confidence_score}%
+                      </span>
+                      <span className={`text-[9px] font-semibold uppercase tracking-wider mt-0.5 ${colors.text} opacity-70`}>
+                        {colors.label}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Confidence bar */}
+                {d.confidence_score !== undefined && (
+                  <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-1000 ease-out ${colors.bar}`}
+                      style={{ width: `${d.confidence_score}%` }}
+                    />
                   </div>
                 )}
-              </div>
-              {d.differential_diagnoses && d.differential_diagnoses.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/[0.06]">
-                  <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold mr-1 self-center">Differential:</span>
-                  {d.differential_diagnoses.map((diff, idx) => (
-                    <span key={idx} className="text-[11px] px-2 py-0.5 rounded-md bg-white/[0.04] text-slate-300 border border-white/[0.06]">
-                      {diff}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </TiltCard>
-          );
-        })}
+
+                {/* Differential diagnoses */}
+                {d.differential_diagnoses && d.differential_diagnoses.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/[0.06]">
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold mr-1 self-center">Differentials:</span>
+                    {d.differential_diagnoses.map((diff, idx) => (
+                      <span key={idx} className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md bg-white/[0.04] text-slate-300 border border-white/[0.06]">
+                        <ChevronRight className="w-2.5 h-2.5 text-slate-600" />
+                        {diff}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </TiltCard>
+            );
+          })}
+        </div>
       </div>
 
+      {/* Treatments */}
       {treatments.length > 0 && (
-        <div className="mt-5 pt-4 border-t border-white/[0.06]">
+        <div className="pt-3 border-t border-white/[0.05]">
           <p className="section-label mb-3 flex items-center gap-2 text-base">
             <Pill className="w-4 h-4 text-emerald-400" />
             Recommended Treatments
           </p>
-          <div className="flex flex-col gap-2">
+          <div className="space-y-2">
             {treatments.map((t, i) => (
               <div
                 key={i}
-                className={`text-sm px-3.5 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-medium fade-in leading-relaxed stagger-${Math.min(i + 1, 6)}`}
+                className={`flex items-start gap-3 p-3.5 rounded-xl bg-emerald-500/[0.04] border border-emerald-500/10 hover:bg-emerald-500/[0.07] transition-all fade-in stagger-${Math.min(i + 1, 6)}`}
               >
-                • {t}
+                <div className="w-6 h-6 rounded-lg bg-emerald-500/15 flex items-center justify-center shrink-0 mt-0.5">
+                  <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                </div>
+                <p className="text-sm text-slate-200 leading-relaxed">{t}</p>
               </div>
             ))}
           </div>
