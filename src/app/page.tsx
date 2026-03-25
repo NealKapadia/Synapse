@@ -17,7 +17,7 @@ import { AppLogo } from "@/components/dashboard/AppLogo";
 import { AnalysisResult } from "@/lib/types";
 import toast from "react-hot-toast";
 
-const POLL_INTERVAL = 5_000;
+const POLL_INTERVAL = 1_000;
 
 const panelVariants = {
   hidden: { opacity: 0, y: 16 },
@@ -95,17 +95,30 @@ export default function Home() {
     }
   }, []);
 
-  // 5-second polling when recording is active
+  // Continuous polling when recording is active
   useEffect(() => {
     if (!isRecording) return;
 
-    const intervalId = setInterval(() => {
-      if (transcriptRef.current.trim()) {
-        handleAnalyze(false);
-      }
-    }, POLL_INTERVAL);
+    let isPollingActive = true;
 
-    return () => clearInterval(intervalId);
+    const poll = async () => {
+      // Initial delay
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
+
+      while (isPollingActive) {
+        if (transcriptRef.current.trim() && !isFetchingRef.current) {
+          await handleAnalyze(false);
+        }
+        // Wait 1 second after the API call completes before polling again
+        await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
+      }
+    };
+
+    poll();
+
+    return () => {
+      isPollingActive = false;
+    };
   }, [isRecording, handleAnalyze]);
 
   const handleRecordingChange = useCallback((recording: boolean) => {
@@ -155,7 +168,7 @@ export default function Home() {
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-red-400" />
                   </span>
                   <span className="text-[11px] text-red-300 font-semibold">AI Active</span>
-                  <span className="text-[9px] text-red-400/60 font-mono">5s poll</span>
+                  <span className="text-[9px] text-red-400/60 font-mono">1s poll</span>
                 </motion.div>
               )}
             </AnimatePresence>
